@@ -26,4 +26,31 @@ public class UserService {
     public User saveUser(User user) {
         return repository.save(user);
     }
+
+    public User loginUser(String username, String password) {
+//        // Thực hiện xác thực và kiểm tra vai trò user
+//        User user = repository.findByUsername(username); // Giả sử có phương thức tìm kiếm theo username
+//        if (user != null && user.getPassword().equals(password) && user.getRole().equals("USER")) {
+//            return user;
+//        }
+        return null;
+    }
+
+    // Phương thức đăng nhập cho merchant
+    public User loginMerchant(String username, String password) {
+//        User merchant = repository.findByUsername(username);
+//        if (merchant != null && merchant.getPassword().equals(password) && merchant.getRole().equals("MERCHANT")) {
+//            return merchant;
+//        }
+        return null;
+    }
+
+
+    public User loginAdmin(String username, String password) {
+//        User admin = repository.findByUsername(username);
+//        if (admin != null && admin.getPassword().equals(password) && admin.getRole().equals("ADMIN")) {
+//            return admin;
+//        }
+        return null;
+    }
 }
