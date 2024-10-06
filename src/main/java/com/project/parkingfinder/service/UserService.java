@@ -13,13 +13,13 @@ public class UserService {
     @Autowired
     private UserRepository repository;
 
-    public User getUser(String id) {
+    public User getUser(Long id) {
         return repository.findById(id).orElse(null);
     }
     public List<User> getAllUsers(){
         return repository.findAll();
     }
-    public void deleteUser(String id) {
+    public void deleteUser(Long id) {
         repository.deleteById(id);
     }
     // Thêm phương thức để lưu user

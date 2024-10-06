@@ -17,7 +17,7 @@ public class UserController {
 
     // API để lấy thông tin user theo id
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable String id) {
+    public ResponseEntity<User> getUserById(@PathVariable Long id) {
         User user = userService.getUser(id);
         if (user != null) {
             return ResponseEntity.ok(user);
@@ -34,7 +34,7 @@ public class UserController {
 
     // API để xóa user theo id
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable String id) {
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();  // Trả về mã 204 (No Content) sau khi xóa thành công
     }

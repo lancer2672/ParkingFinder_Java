@@ -1,20 +1,26 @@
 package com.project.parkingfinder.model;
 
-
+import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+
 @Getter
 @Setter
 @ToString
-@Document(collection = "users")
+@NoArgsConstructor
+@Entity
+@Table(name = "users")
 public class User {
+
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     private String name;
     private String email;
-    private String age;
-    // Constructors, getters, and setters
+    public User(String name, String email, String age) {
+        this.name = name;
+        this.email = email;
+    }
 }

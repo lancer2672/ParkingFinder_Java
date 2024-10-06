@@ -1,11 +1,14 @@
 package com.project.parkingfinder.repository;
 
-
 import com.project.parkingfinder.model.User;
-import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-public interface UserRepository extends MongoRepository<User, String> {
+@Repository
+public interface UserRepository extends JpaRepository<User, Long> {
 
+    List<User> findByName(String name);
+    List<User> findByEmail(String email);
 }
