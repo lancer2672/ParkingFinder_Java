@@ -1,20 +1,34 @@
 package com.project.parkingfinder.controller;
 
+import com.project.parkingfinder.enums.RoleEnum;
+import com.project.parkingfinder.model.Role;
 import com.project.parkingfinder.model.User;
+import com.project.parkingfinder.service.RoleService;
 import com.project.parkingfinder.service.UserService;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+
 import java.util.List;
+import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/users")
+@Validated
 public class UserController {
 
     @Autowired
     private UserService userService;
+    private RoleService repoService;
+    @Autowired
+    private RoleService roleService;
 
     @GetMapping("/{id}")
     public ResponseEntity<User> getUserById(@PathVariable Long id) {
@@ -46,8 +60,8 @@ public class UserController {
     // New login methods
 
     @PostMapping("/login")
-    public ResponseEntity<?> loginUser(@RequestBody LoginRequest loginRequest) {
-        User user = userService.loginUser(loginRequest.getUsername(), loginRequest.getPassword());
+    public ResponseEntity<?> loginUser(@Valid @RequestBody LoginRequest loginRequest) {
+        User user = userService.loginUser(loginRequest.getPhoneNumber(), loginRequest.getPassword());
         if (user != null) {
             return ResponseEntity.ok(user);
         } else {
@@ -55,29 +69,88 @@ public class UserController {
         }
     }
 
-    @PostMapping("/merchant/login")
-    public ResponseEntity<?> loginMerchant(@RequestBody LoginRequest loginRequest) {
-        User merchant = userService.loginMerchant(loginRequest.getUsername(), loginRequest.getPassword());
-        if (merchant != null) {
-            return ResponseEntity.ok(merchant);
-        } else {
-            return ResponseEntity.badRequest().body("Invalid credentials or not a merchant");
+    @PostMapping("/signup")
+    public ResponseEntity<?> signUpUser(@Valid @RequestBody SignUpRequest signUpRequest) {
+
+        validateSignUpRequest(signUpRequest);
+        if (userService.isPhoneNumberExists(signUpRequest.getPhoneNumber())) {
+            return ResponseEntity.badRequest().body("Phone number already registered");
         }
+
+        User newUser = createUser(signUpRequest);
+        User createdUser = userService.saveUser(newUser);
+
+        return ResponseEntity.ok(convertToResponseDTO(createdUser));
     }
 
-    @PostMapping("/admin/login")
-    public ResponseEntity<?> loginAdmin(@RequestBody LoginRequest loginRequest) {
-        User admin = userService.loginAdmin(loginRequest.getUsername(), loginRequest.getPassword());
-        if (admin != null) {
-            return ResponseEntity.ok(admin);
-        } else {
-            return ResponseEntity.badRequest().body("Invalid credentials or not an admin");
-        }
+    private void validateSignUpRequest(SignUpRequest signUpRequest) {
+
+            throw new IllegalArgumentException("Invalid role: " + signUpRequest.getRole());
     }
+
+    private User createUser(SignUpRequest signUpRequest) {
+        User newUser = new User();
+        newUser.setPhoneNumber(signUpRequest.getPhoneNumber());
+        newUser.setPassword(signUpRequest.getPassword()); // Remember to hash the password
+        newUser.setName(signUpRequest.getName());
+        newUser.setEmail(signUpRequest.getEmail());
+
+        Optional<Role> role = roleService.getRoleByName(signUpRequest.getRole().toUpperCase());
+        if (role.isEmpty()) {
+            throw new RuntimeException("Role not found: " + signUpRequest.getRole());
+        }
+        newUser.setRole(role.get());
+
+        return newUser;
+    }
+
+    private UserResponseDTO convertToResponseDTO(User user) {
+        UserResponseDTO responseDTO = new UserResponseDTO();
+        responseDTO.setId(user.getId());
+        responseDTO.setName(user.getName());
+        responseDTO.setEmail(user.getEmail());
+
+        return responseDTO;
+    }
+
+
+    @Data
+    public class UserResponseDTO {
+        private Long id;
+        private String name;
+        private String email;
+    }
+
+    @Data
+    public static class LoginRequest {
+        @NotBlank(message = "Phone number is required")
+        private String phoneNumber;
+
+        @NotBlank(message = "Password is required")
+        private String password;
+    }
+
+    @Data
+    public static class SignUpRequest {
+
+        @NotBlank(message = "Phone number is required")
+        private String phoneNumber;
+
+        @NotBlank(message = "Password is required")
+        @Size(min = 6, message = "Password must be at least 6 characters")
+        private String password;
+
+        @NotBlank(message = "Email is required")
+        @Email(message = "Email should be valid")
+        private String email;
+
+        @NotBlank(message = "Name is required")
+        private String name;
+
+        @NotBlank(message = "Role is required")
+        private String role;
+        // Getters and Setters
+    }
+
 }
 
-@Data
-class LoginRequest {
-    private String username;
-    private String password;
-}
