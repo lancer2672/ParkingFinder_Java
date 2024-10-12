@@ -34,12 +34,12 @@ public class UserController {
 
     @Autowired
     private UserService userService;
-    private RoleService repoService;
     @Autowired
     private RoleService roleService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable Long id) {
+    public ResponseEntity<User> getUserById(@PathVariable("id") Long id) {
+        System.out.println("Getting user with id: " + id);
         User user = userService.getUser(id);
         if (user != null) {
             return ResponseEntity.ok(user);
