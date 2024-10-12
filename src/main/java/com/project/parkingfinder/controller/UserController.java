@@ -1,23 +1,31 @@
 package com.project.parkingfinder.controller;
 
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.project.parkingfinder.dto.LoginResponse;
 import com.project.parkingfinder.enums.RoleEnum;
 import com.project.parkingfinder.model.Role;
 import com.project.parkingfinder.model.User;
 import com.project.parkingfinder.service.RoleService;
 import com.project.parkingfinder.service.UserService;
+
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
-
-
-import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/users")
@@ -61,27 +69,27 @@ public class UserController {
 
     @PostMapping("/admin/signin")
     public ResponseEntity<?> loginAdmin(@Valid @RequestBody LoginRequest loginRequest) {
-        User user = userService.loginAdmin(loginRequest.getPhoneNumber(), loginRequest.getPassword());
-        if (user != null) {
-            return ResponseEntity.ok(user);
+        LoginResponse resp = userService.loginAdmin(loginRequest.getPhoneNumber(), loginRequest.getPassword());
+        if (resp != null) {
+            return ResponseEntity.ok(resp);
         } else {
             return ResponseEntity.badRequest().body("Invalid credentials");
         }
     }
     @PostMapping("/merchant/signin")
     public ResponseEntity<?> loginMerchant(@Valid @RequestBody LoginRequest loginRequest) {
-        User user = userService.loginMerchant(loginRequest.getPhoneNumber(), loginRequest.getPassword());
-        if (user != null) {
-            return ResponseEntity.ok(user);
+        LoginResponse resp  = userService.loginMerchant(loginRequest.getPhoneNumber(), loginRequest.getPassword());
+        if (resp != null) {
+            return ResponseEntity.ok(resp);
         } else {
             return ResponseEntity.badRequest().body("Invalid credentials");
         }
     }
     @PostMapping("/signin")
     public ResponseEntity<?> loginUser(@Valid @RequestBody LoginRequest loginRequest) {
-        User user = userService.loginUser(loginRequest.getPhoneNumber(), loginRequest.getPassword());
-        if (user != null) {
-            return ResponseEntity.ok(user);
+        LoginResponse resp = userService.loginUser(loginRequest.getPhoneNumber(), loginRequest.getPassword());
+        if (resp != null) {
+            return ResponseEntity.ok(resp);
         } else {
             return ResponseEntity.badRequest().body("Invalid credentials");
         }
