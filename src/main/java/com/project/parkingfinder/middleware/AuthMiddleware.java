@@ -1,3 +1,5 @@
+package com.project.parkingfinder.middleware;
+
 import org.springframework.stereotype.Component;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -15,7 +17,7 @@ public class AuthMiddleware implements Filter {
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
-        // Khởi tạo nếu cần
+
     }
 
     @Override
@@ -29,9 +31,7 @@ public class AuthMiddleware implements Filter {
         }
 
         String token = authHeader.substring(7); // Lấy token từ header
-        // Thêm logic xác thực token ở đây (ví dụ, sử dụng JWT)
 
-        // Tiếp tục chuỗi filter
         chain.doFilter(request, response);
     }
 

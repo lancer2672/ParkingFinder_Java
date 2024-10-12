@@ -1,7 +1,18 @@
 package com.project.parkingfinder.enums;
 
-public enum Role {
+public enum RoleEnum {
     USER,
     MERCHANT,
     ADMIN;
+    public static boolean isValidRole(String role) {
+        if (role == null) {
+            return false;
+        }
+        for (RoleEnum r : RoleEnum.values()) {
+            if (r.name().equalsIgnoreCase(role)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

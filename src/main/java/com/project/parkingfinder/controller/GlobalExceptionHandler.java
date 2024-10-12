@@ -13,7 +13,6 @@ import org.springframework.web.context.request.WebRequest;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -21,13 +20,16 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(IllegalArgumentException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException e, WebRequest request) {
+        System.out.println("Last Error: " + e.getMessage()); // In ra lỗi cuối cùng
         ErrorResponse errorResponse = new ErrorResponse(new Date(), e.getMessage(), request.getDescription(false));
         return ResponseEntity.badRequest().body(errorResponse);
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException   .class)
+    // Xử lý MethodArgumentNotValidException
+    @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        System.out.println("Last Error: " + ex.getMessage()); // In ra lỗi cuối cùng
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getAllErrors().forEach((error) -> {
             String fieldName = ((FieldError) error).getField();
@@ -41,6 +43,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(RuntimeException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ResponseEntity<ErrorResponse> handleRuntimeException(RuntimeException e, WebRequest request) {
+        System.out.println("Last Error: " + e.getMessage()); // In ra lỗi cuối cùng
         ErrorResponse errorResponse = new ErrorResponse(new Date(), "Internal server error", request.getDescription(false));
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
     }
@@ -49,6 +52,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ResponseEntity<ErrorResponse> handleAllExceptions(Exception e, WebRequest request) {
+        System.out.println("Last Error: " + e.getMessage()); // In ra lỗi cuối cùng
         ErrorResponse errorResponse = new ErrorResponse(new Date(), "An unexpected error occurred", request.getDescription(false));
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
     }
@@ -65,6 +69,5 @@ public class GlobalExceptionHandler {
             this.message = message;
             this.details = details;
         }
-
     }
 }

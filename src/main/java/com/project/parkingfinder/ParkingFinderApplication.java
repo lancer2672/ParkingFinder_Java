@@ -10,7 +10,7 @@ public class ParkingFinderApplication {
     @RestController
     public class HelloController {
 
-        @GetMapping("/hello")
+        @GetMapping("/health")
         public String sayHello() {
             return "Hello, World!";
         }

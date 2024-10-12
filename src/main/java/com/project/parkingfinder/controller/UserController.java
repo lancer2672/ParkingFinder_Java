@@ -59,7 +59,25 @@ public class UserController {
 
     // New login methods
 
-    @PostMapping("/login")
+    @PostMapping("/admin/signin")
+    public ResponseEntity<?> loginAdmin(@Valid @RequestBody LoginRequest loginRequest) {
+        User user = userService.loginAdmin(loginRequest.getPhoneNumber(), loginRequest.getPassword());
+        if (user != null) {
+            return ResponseEntity.ok(user);
+        } else {
+            return ResponseEntity.badRequest().body("Invalid credentials");
+        }
+    }
+    @PostMapping("/merchant/signin")
+    public ResponseEntity<?> loginMerchant(@Valid @RequestBody LoginRequest loginRequest) {
+        User user = userService.loginMerchant(loginRequest.getPhoneNumber(), loginRequest.getPassword());
+        if (user != null) {
+            return ResponseEntity.ok(user);
+        } else {
+            return ResponseEntity.badRequest().body("Invalid credentials");
+        }
+    }
+    @PostMapping("/signin")
     public ResponseEntity<?> loginUser(@Valid @RequestBody LoginRequest loginRequest) {
         User user = userService.loginUser(loginRequest.getPhoneNumber(), loginRequest.getPassword());
         if (user != null) {
@@ -84,9 +102,13 @@ public class UserController {
     }
 
     private void validateSignUpRequest(SignUpRequest signUpRequest) {
-
+        boolean isValidRole = RoleEnum.isValidRole(signUpRequest.getRole());
+        if (!isValidRole) {
             throw new IllegalArgumentException("Invalid role: " + signUpRequest.getRole());
+        }
     }
+
+
 
     private User createUser(SignUpRequest signUpRequest) {
         User newUser = new User();

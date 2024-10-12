@@ -1,2 +1,4 @@
-package com.project.parkingfinder.dto;public class User {
+package com.project.parkingfinder.dto;
+
+public class UserDTO {
 }

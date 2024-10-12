@@ -1,3 +1,5 @@
+package com.project.parkingfinder.middleware;
+
 import org.springframework.stereotype.Component;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;

@@ -1,3 +1,5 @@
+package com.project.parkingfinder.middleware;
+
 import org.springframework.stereotype.Component;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -21,16 +23,15 @@ public class CORSMiddleware implements Filter {
             throws IOException, ServletException {
         HttpServletResponse httpResponse = (HttpServletResponse) response;
 
-        httpResponse.setHeader("Access-Control-Allow-Origin", "*"); // Cho phép tất cả các nguồn
+        httpResponse.setHeader("Access-Control-Allow-Origin", "*");
         httpResponse.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
         httpResponse.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, X-API-KEY");
 
-        // Tiếp tục chuỗi filter
         chain.doFilter(request, response);
     }
 
     @Override
     public void destroy() {
-        // Dọn dẹp tài nguyên nếu cần
+
     }
 }

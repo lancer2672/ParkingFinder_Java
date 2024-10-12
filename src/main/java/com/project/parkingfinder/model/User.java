@@ -1,13 +1,14 @@
 package com.project.parkingfinder.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.Set;
 
+
 @Getter
 @Setter
-@ToString
 @NoArgsConstructor
 @Entity
 @Table(name = "users")
@@ -18,14 +19,26 @@ public class User {
     private Long id;
 
     private String name;
+    private String phoneNumber;
+
+    @JsonIgnore
+    private String password;
+
     private String email;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "role_id")
+    @JsonIgnore
     private Role role;
 
-    public User(String name, String email) {
-        this.name = name;
-        this.email = email;
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", phoneNumber='" + phoneNumber + '\'' +
+                ", email='" + email + '\'' +
+                ", role=" + (role != null ? role.getName() : "null") +
+                '}';
     }
 }
