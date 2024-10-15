@@ -3,6 +3,7 @@ package com.project.parkingfinder.model;
 import javax.persistence.*;
 import java.time.LocalTime;
 
+
 @Entity
 @Table(name = "ParkingLots")
 public class ParkingLot {
@@ -41,9 +42,13 @@ public class ParkingLot {
     @Column(name = "close_hour")
     private LocalTime closeHour;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "status")
-    private String status;
+    private ParkingLotStatus status;
 
     public ParkingLot() {}
 
+    public boolean isApproved() {
+        return status == ParkingLotStatus.ACTIVE;
+    }
 }
