@@ -26,7 +26,9 @@ public class ParkingLotService {
 
     public ParkingLotDTO getParkingLotById(Long id) {
         ParkingLot parkingLot = parkingLotRepository.findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("ParkingLot not found with id: " + id));
+            .orElseThrow(() -> {
+                throw new ResourceNotFoundException("ParkingLot not found with id: " + id);
+            });
         return convertToDTO(parkingLot);
     }
 
