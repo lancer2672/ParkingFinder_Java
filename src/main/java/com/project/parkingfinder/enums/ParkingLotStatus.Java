@@ -1,4 +1,4 @@
-package com.project.parkingfinder.model;
+package com.project.parkingfinder.enums;
 
 public enum ParkingLotStatus {
     PENDING,
