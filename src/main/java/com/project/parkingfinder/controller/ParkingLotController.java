@@ -1,11 +1,15 @@
 package com.project.parkingfinder.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.project.parkingfinder.dto.ParkingLotDTO;
@@ -27,5 +31,21 @@ public class ParkingLotController {
         ParkingLotDTO createdParkingLot = parkingLotService.createParkingLot(parkingLotDTO);
         return new ResponseEntity<>(createdParkingLot, HttpStatus.CREATED);
     }
-}
 
+    @GetMapping
+    public ResponseEntity<List<ParkingLotDTO>> getAllParkingLots(
+            @RequestParam(defaultValue = "10") int limit,
+            @RequestParam(defaultValue = "0") int offset) {
+        List<ParkingLotDTO> parkingLots = parkingLotService.getAllParkingLots(limit, offset);
+        return new ResponseEntity<>(parkingLots, HttpStatus.OK);
+    }
+
+    @GetMapping("/region")
+    public ResponseEntity<List<ParkingLotDTO>> getParkingLotsInRegion(
+            @RequestParam Double latitude,
+            @RequestParam Double longitude,
+            @RequestParam Double radius) {
+        List<ParkingLotDTO> parkingLots = parkingLotService.getParkingLotsInRegion(latitude, longitude, radius);
+        return new ResponseEntity<>(parkingLots, HttpStatus.OK);
+    }
+}

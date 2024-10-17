@@ -1,7 +1,14 @@
 package com.project.parkingfinder.model;
 
-import javax.persistence.*;
 import java.time.LocalTime;
+
+import com.project.parkingfinder.enums.ParkingLotStatus;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 
 
 @Entity
