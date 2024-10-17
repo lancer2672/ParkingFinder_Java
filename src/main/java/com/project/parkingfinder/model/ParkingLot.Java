@@ -6,11 +6,17 @@ import com.project.parkingfinder.enums.ParkingLotStatus;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
 
-
+@Getter
+@Setter
 @Entity
 @Table(name = "ParkingLots")
 public class ParkingLot {
@@ -34,8 +40,8 @@ public class ParkingLot {
     @Column(name = "name")
     private String name;
 
-    @Column(name = "street_address")
-    private String streetAddress;
+    @Column(name = "address")
+    private String address;
 
     @Column(name = "longitude")
     private Double longitude;
@@ -52,6 +58,9 @@ public class ParkingLot {
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
     private ParkingLotStatus status;
+    
+    @Column(name = "image_url")
+    private String imageUrl;
 
     public ParkingLot() {}
 

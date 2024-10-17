@@ -70,10 +70,11 @@ public class ParkingLotService {
     private void updateParkingLotFromDTO(ParkingLot parkingLot, ParkingLotDTO dto) {
         parkingLot.setName(dto.getName());
         parkingLot.setAddress(dto.getAddress());
-        parkingLot.setCapacity(dto.getCapacity());
         parkingLot.setLatitude(dto.getLatitude());
         parkingLot.setLongitude(dto.getLongitude());
         parkingLot.setStatus(dto.getStatus());
+        parkingLot.setImageUrl(dto.getImageUrl());
+        // Set other fields as needed
     }
 
     private ParkingLotDTO convertToDTO(ParkingLot parkingLot) {
@@ -81,10 +82,13 @@ public class ParkingLotService {
             parkingLot.getId(),
             parkingLot.getName(),
             parkingLot.getAddress(),
-            parkingLot.getCapacity(),
+            // parkingLot.getCapacity(),
+            1,
             parkingLot.getLatitude(),
             parkingLot.getLongitude(),
-            parkingLot.getStatus()
+            parkingLot.getStatus(),
+            parkingLot.getImageUrl()
         );
     }
+
 }

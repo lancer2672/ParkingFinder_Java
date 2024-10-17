@@ -7,11 +7,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-  // Lombok annotations
-  @Getter
-  @Setter
-  @NoArgsConstructor
-  @AllArgsConstructor
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class ParkingLotDTO {
     private Long id;
     private String name;
@@ -20,4 +19,5 @@ public class ParkingLotDTO {
     private double latitude;
     private double longitude;
     private ParkingLotStatus status;
+    private String imageUrl;
 }
