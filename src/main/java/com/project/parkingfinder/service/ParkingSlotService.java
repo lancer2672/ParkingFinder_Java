@@ -1,49 +1,46 @@
 package com.project.parkingfinder.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.project.parkingfinder.dto.ParkingSlotDTO;
-import com.project.parkingfinder.enums.VehicleTypeEnum;
 import com.project.parkingfinder.exception.ResourceNotFoundException;
 import com.project.parkingfinder.model.ParkingSlot;
+import com.project.parkingfinder.model.VehicleType;
 import com.project.parkingfinder.repository.ParkingLotRepository;
 import com.project.parkingfinder.repository.ParkingSlotRepository;
+import com.project.parkingfinder.repository.VehicleTypeRepository;
 
 @Service
 public class ParkingSlotService {
     private final ParkingSlotRepository parkingSlotRepository;
     private final ParkingLotRepository parkingLotRepository;
+    private final VehicleTypeRepository vehicleTypeRepository;
 
     @Autowired
-    public ParkingSlotService(ParkingSlotRepository parkingSlotRepository, ParkingLotRepository parkingLotRepository) {
+    public ParkingSlotService(ParkingSlotRepository parkingSlotRepository, ParkingLotRepository parkingLotRepository, VehicleTypeRepository vehicleTypeRepository) {
         this.parkingSlotRepository = parkingSlotRepository;
         this.parkingLotRepository = parkingLotRepository;
+        this.vehicleTypeRepository = vehicleTypeRepository;
     }
 
-    public List<ParkingSlotDTO> addParkingSlots(Long parkingLotId, VehicleTypeEnum vehicleType, Double price, Integer quantity) {
+    public ParkingSlotDTO addParkingSlots(Long parkingLotId, Long vehicleTypeId, Integer quantity) {
+
+        VehicleType vehicleType = vehicleTypeRepository.findById(vehicleTypeId)
+            .orElseThrow(() -> new ResourceNotFoundException("Vehicle type not found with id: " + vehicleTypeId));
+
         parkingLotRepository.findById(parkingLotId)
             .orElseThrow(() -> new ResourceNotFoundException("Parking lot not found with id: " + parkingLotId));
 
-        List<ParkingSlot> parkingSlotsToSave = new ArrayList<>();
-        for (int i = 0; i < quantity; i++) {
-            ParkingSlot parkingSlot = new ParkingSlot();
-            parkingSlot.setParkingLotId(parkingLotId);
-            parkingSlot.setVehicleType(vehicleType);
-            parkingSlot.setTotalSlots(quantity);
-            parkingSlot.setActiveSlots(quantity);
-            parkingSlotsToSave.add(parkingSlot);
-        }
+        ParkingSlot parkingSlot = new ParkingSlot();
+        parkingSlot.setParkingLotId(parkingLotId);
+        parkingSlot.setVehicleType(vehicleType.getType());
+        parkingSlot.setTotalSlots(quantity);
+        parkingSlot.setActiveSlots(quantity);
 
-        List<ParkingSlot> savedParkingSlots = parkingSlotRepository.saveAll(parkingSlotsToSave);
+        ParkingSlot savedParkingSlot = parkingSlotRepository.save(parkingSlot);
         
-        return savedParkingSlots.stream()
-            .map(parkingSlot -> convertToDTO(parkingSlot, price))
-            .collect(Collectors.toList());
+        return convertToDTO(savedParkingSlot, vehicleType.getPrice());
     }
 
     private ParkingSlot convertToEntity(ParkingSlotDTO dto) {

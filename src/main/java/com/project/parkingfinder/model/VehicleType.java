@@ -27,7 +27,7 @@ public class VehicleType {
     
     @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false)
-    private VehicleTypeEnum type;
+    private VehicleTypeEnum type;   
     
     @Column(name = "price", nullable = false)
     private Double price;

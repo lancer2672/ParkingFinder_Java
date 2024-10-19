@@ -36,3 +36,5 @@ public class ParkingSlot {
     @Column(name = "active_slots", nullable = false)
     private Integer activeSlots;
 }
+
+//TODO: refactor error response to be more human readable

@@ -4,13 +4,13 @@ package com.project.parkingfinder.dto;
 import java.time.LocalTime;
 import java.util.List;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.project.parkingfinder.enums.ParkingLotStatus;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -41,7 +41,6 @@ import lombok.Setter;
         @NotBlank(message = "Address is required")
         private String address;
 
-        @NotNull(message = "Capacity is required")
         private int capacity;
 
         @NotNull(message = "Latitude is required")
@@ -64,17 +63,16 @@ import lombok.Setter;
         private List<MultipartFile> imageFiles;
 
         // Constructor for creating a new ParkingLotDTO with image files
-        public ParkingLotDTO(String name, String address,  double latitude,int capacity, double longitude,
+        public ParkingLotDTO(String name, String address,  double latitude,double longitude,
                              LocalTime openHour, LocalTime closeHour, List<MultipartFile> imageFiles,
                              Long ownerId, Long provinceId, Long districtId, Long wardId) {
             this.name = name;
             this.address = address;
             this.latitude = latitude;
-            this.longitude = longitude;
+            this.longitude = longitude; 
             this.openHour = openHour;
             this.closeHour = closeHour;
             this.imageFiles = imageFiles;
-            this.capacity = capacity;
             this.status = ParkingLotStatus.PENDING; // Set default status to PENDING
             this.ownerId = ownerId;
             this.provinceId = provinceId;
