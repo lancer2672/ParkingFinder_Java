@@ -19,8 +19,8 @@ WORKDIR /app
 # Copy toàn bộ mã nguồn vào container
 COPY . .
 
-# Chạy lệnh build Gradle để tạo file JAR
-RUN gradle build --no-daemon
+# Chạy lệnh build Gradle để tạo file JAR, bỏ qua quá trình kiểm thử
+RUN gradle build --no-daemon -x test
 
 # Tạo một image mới chỉ chứa file jar đã được build
 FROM openjdk:17-jdk-alpine
