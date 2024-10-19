@@ -34,13 +34,13 @@ public class ParkingLot {
     private Long ownerId;
 
     @Column(name = "province_id")
-    private Long provinceId;
+    private String provinceId;
 
     @Column(name = "district_id")
-    private Long districtId;
+    private String districtId;
 
     @Column(name = "ward_id")
-    private Long wardId;
+    private String wardId;
 
     @Column(name = "name")
     private String name;

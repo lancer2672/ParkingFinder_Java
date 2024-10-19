@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.project.parkingfinder.dto.ParkingLotDTO;
+import com.project.parkingfinder.enums.ParkingLotStatus;
 import com.project.parkingfinder.exception.ResourceNotFoundException;
 import com.project.parkingfinder.model.Media;
 import com.project.parkingfinder.model.ParkingLot;
@@ -84,13 +85,21 @@ public class ParkingLotService  {
             .collect(Collectors.toList());
     }
 
+    public List<ParkingLotDTO> getParkingLotsByStatus(ParkingLotStatus status, int limit, int offset) {
+        PageRequest pageRequest = PageRequest.of(offset, limit);
+        List<ParkingLot> parkingLots = parkingLotRepository.findByStatus(status, pageRequest);
+        return parkingLots.stream()
+            .map(this::convertToDTO)
+            .collect(Collectors.toList());
+    }
+
     private ParkingLot convertToEntity(ParkingLotDTO dto) {
         ParkingLot parkingLot = new ParkingLot();
         updateParkingLotFromDTO(parkingLot, dto);
         return parkingLot;
     }
-
-        private void updateParkingLotFromDTO(ParkingLot parkingLot, ParkingLotDTO dto) {
+    
+    private void updateParkingLotFromDTO(ParkingLot parkingLot, ParkingLotDTO dto) {
             parkingLot.setName(dto.getName());
             parkingLot.setAddress(dto.getAddress());
             parkingLot.setLatitude(dto.getLatitude());
@@ -151,7 +160,7 @@ public class ParkingLotService  {
         dto.setWardId(parkingLot.getWardId());
         dto.setOpenHour(parkingLot.getOpenHour());
         dto.setCloseHour(parkingLot.getCloseHour());
-
+        dto.fetchLocationNames();
         return dto;
     }
 

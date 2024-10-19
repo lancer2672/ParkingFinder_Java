@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.project.parkingfinder.dto.ParkingLotDTO;
 import com.project.parkingfinder.dto.ParkingSlotDTO;
+import com.project.parkingfinder.enums.ParkingLotStatus;
 import com.project.parkingfinder.service.ParkingLotService;
 import com.project.parkingfinder.service.ParkingSlotService;
 
@@ -49,9 +50,9 @@ public class ParkingLotController {
             @Valid @RequestParam("closeHour") String closeHour,
             @RequestParam(value = "imageFiles", required = false) List<MultipartFile> imageFiles,
             @Valid @RequestParam("ownerId") Long ownerId,
-            @Valid @RequestParam("provinceId") Long provinceId,
-            @Valid @RequestParam("districtId") Long districtId,
-            @Valid @RequestParam("wardId") Long wardId) {
+            @Valid @RequestParam("provinceId") String provinceId,
+            @Valid @RequestParam("districtId") String districtId,
+            @Valid @RequestParam("wardId") String wardId) {
         
         ParkingLotDTO parkingLotDTO = new ParkingLotDTO(name, address, latitude, longitude,
                 LocalTime.parse(openHour), LocalTime.parse(closeHour), imageFiles,
@@ -69,11 +70,12 @@ public class ParkingLotController {
         return new ResponseEntity<>(parkingLots, HttpStatus.OK);
     }
 
-    @GetMapping("/region")
-    public ResponseEntity<List<ParkingLotDTO>> getParkingLotsInRegion(
-            @RequestParam Double latitude,
-            @RequestParam Double longitude,
-            @RequestParam Double radius) {
+   
+    @GetMapping("region")
+    public ResponseEntity<List<ParkingLotDTO>> getActiveParkingLotsInRegion(
+            @RequestParam(name = "lat") Double latitude,
+            @RequestParam(name = "lng") Double longitude,
+            @RequestParam(name = "radius_km") Double radius) {
         List<ParkingLotDTO> parkingLots = parkingLotService.getParkingLotsInRegion(latitude, longitude, radius);
         return new ResponseEntity<>(parkingLots, HttpStatus.OK);
     }
@@ -98,13 +100,12 @@ public class ParkingLotController {
         private Integer quantity;
     }
 
-    // @PostMapping("/{id}/image")
-    // public ResponseEntity<ParkingLotDTO> uploadImage(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
-    //     try {
-    //         ParkingLotDTO updatedParkingLot = parkingLotService.uploadImage(id, file);
-    //         return new ResponseEntity<>(updatedParkingLot, HttpStatus.OK);
-    //     } catch (IOException e) {
-    //         return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-    //     }
-    // }
+    @GetMapping("/status")
+    public ResponseEntity<List<ParkingLotDTO>> getParkingLotsByStatus(
+            @RequestParam(name = "status") ParkingLotStatus status,
+            @RequestParam(name = "limit", defaultValue = "10") int limit,
+            @RequestParam(name = "offset", defaultValue = "0") int offset) {
+        List<ParkingLotDTO> parkingLots = parkingLotService.getParkingLotsByStatus(status, limit, offset);
+        return new ResponseEntity<>(parkingLots, HttpStatus.OK);
+    }
 }
