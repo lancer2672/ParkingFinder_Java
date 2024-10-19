@@ -1,10 +1,11 @@
 package com.project.parkingfinder.dto;
 
-import com.project.parkingfinder.enums.ParkingSlotStatus;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.NoArgsConstructor;
+import com.project.parkingfinder.enums.VehicleTypeEnum;
+
 import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter
@@ -12,7 +13,9 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class ParkingSlotDTO {
     private Long id;
-    private String slotNumber;
-    private ParkingSlotStatus status;
     private Long parkingLotId;
+    private VehicleTypeEnum type;
+    private Double price;
+    private Integer totalSlots;
+    private Integer activeSlots;
 }

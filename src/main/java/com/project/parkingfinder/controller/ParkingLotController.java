@@ -3,12 +3,12 @@ package com.project.parkingfinder.controller;
 import java.time.LocalTime;
 import java.util.List;
 
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -16,17 +16,24 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.project.parkingfinder.dto.ParkingLotDTO;
+import com.project.parkingfinder.dto.ParkingSlotDTO;
+import com.project.parkingfinder.enums.VehicleTypeEnum;
 import com.project.parkingfinder.service.ParkingLotService;
+import com.project.parkingfinder.service.ParkingSlotService;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/parking-lots")
 public class ParkingLotController {
 
     private final ParkingLotService parkingLotService;
+    private final ParkingSlotService parkingSlotService;
 
     @Autowired
-    public ParkingLotController(ParkingLotService parkingLotService) {
+    public ParkingLotController(ParkingLotService parkingLotService, ParkingSlotService parkingSlotService) {
         this.parkingLotService = parkingLotService;
+        this.parkingSlotService = parkingSlotService;
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -67,6 +74,17 @@ public class ParkingLotController {
             @RequestParam Double radius) {
         List<ParkingLotDTO> parkingLots = parkingLotService.getParkingLotsInRegion(latitude, longitude, radius);
         return new ResponseEntity<>(parkingLots, HttpStatus.OK);
+    }
+
+    @PostMapping("/{parkingLotId}/parking-slots")
+    public ResponseEntity<List<ParkingSlotDTO>> addParkingSlots(
+            @PathVariable Long parkingLotId,
+            @Valid @RequestParam("vehicleType") VehicleTypeEnum vehicleType,
+            @Valid @RequestParam("price") Double price,
+            @Valid @RequestParam("quantity") Integer quantity) {
+        
+        List<ParkingSlotDTO> addedParkingSlots = parkingSlotService.addParkingSlots(parkingLotId, vehicleType, price, quantity);
+        return new ResponseEntity<>(addedParkingSlots, HttpStatus.CREATED);
     }
 
     // @PostMapping("/{id}/image")

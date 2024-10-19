@@ -14,7 +14,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "Media")
+@Table(name = "medias")
 public class Media {
 
     @Id

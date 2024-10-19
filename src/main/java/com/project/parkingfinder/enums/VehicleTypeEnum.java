@@ -1,6 +1,6 @@
 package com.project.parkingfinder.enums;
 
-public enum VehicleType {
+public enum VehicleTypeEnum {
     CAR,
     MOTORCYCLE,
     BICYCLE,
