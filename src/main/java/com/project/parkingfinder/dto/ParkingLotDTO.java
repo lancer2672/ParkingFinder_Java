@@ -20,4 +20,6 @@ public class ParkingLotDTO {
     private double longitude;
     private ParkingLotStatus status;
     private String imageUrl;
+//    private String imageUrls
+//    private String avatar
 }
