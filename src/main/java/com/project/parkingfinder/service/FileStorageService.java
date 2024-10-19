@@ -23,12 +23,23 @@ public class FileStorageService {
         this.fileStorageLocation = Paths.get(uploadDir).toAbsolutePath().normalize();
         Files.createDirectories(this.fileStorageLocation);
     }
-
     public String storeFile(MultipartFile file) throws IOException {
-        String fileName = StringUtils.cleanPath(file.getOriginalFilename());
-        Path targetLocation = this.fileStorageLocation.resolve(fileName);
+        String originalFileName = StringUtils.cleanPath(file.getOriginalFilename());
+        String fileExtension = StringUtils.getFilenameExtension(originalFileName);
+        String baseFileName = StringUtils.stripFilenameExtension(originalFileName);
+        
+        String hashedFileName = generateHashedFileName(baseFileName);
+        String newFileName = hashedFileName + "." + fileExtension;
+        
+        Path targetLocation = this.fileStorageLocation.resolve(newFileName);
         Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
-        return fileName;
+        return newFileName;
+    }
+
+    private String generateHashedFileName(String fileName) {
+        long timestamp = System.currentTimeMillis();
+        String toHash = fileName + timestamp;
+        return Integer.toHexString(toHash.hashCode());
     }
 
     public Resource loadFileAsResource(String fileName) {

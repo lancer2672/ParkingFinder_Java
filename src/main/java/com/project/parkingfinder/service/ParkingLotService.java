@@ -1,5 +1,7 @@
 package com.project.parkingfinder.service;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -7,6 +9,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.project.parkingfinder.dto.ParkingLotDTO;
 import com.project.parkingfinder.exception.ResourceNotFoundException;
@@ -15,12 +18,28 @@ import com.project.parkingfinder.model.ParkingLot;
 import com.project.parkingfinder.repository.ParkingLotRepository;
 
 @Service
-public class ParkingLotService {
+public class ParkingLotService  {
 
     @Autowired
     private ParkingLotRepository parkingLotRepository;
 
+    @Autowired
+    private FileStorageService fileStorageService;
+
     public ParkingLotDTO createParkingLot(ParkingLotDTO parkingLotDTO) {
+        List<String> imageUrls = new ArrayList<>();
+        if (parkingLotDTO.getImageFiles() != null) {
+            for (MultipartFile file : parkingLotDTO.getImageFiles()) {
+                try {
+                    String imageUrl = fileStorageService.storeFile(file);
+                    imageUrls.add(imageUrl);
+                } catch (IOException e) {
+                    throw new RuntimeException("Failed to store file", e);
+                }
+            }
+        }
+        parkingLotDTO.setImages(imageUrls);
+
         ParkingLot parkingLot = convertToEntity(parkingLotDTO);
         ParkingLot savedParkingLot = parkingLotRepository.save(parkingLot);
         return convertToDTO(savedParkingLot);
@@ -71,14 +90,44 @@ public class ParkingLotService {
         return parkingLot;
     }
 
-    private void updateParkingLotFromDTO(ParkingLot parkingLot, ParkingLotDTO dto) {
-        parkingLot.setName(dto.getName());
-        parkingLot.setAddress(dto.getAddress());
-        parkingLot.setLatitude(dto.getLatitude());
-        parkingLot.setLongitude(dto.getLongitude());
-        parkingLot.setStatus(dto.getStatus());
-    
-    }
+        private void updateParkingLotFromDTO(ParkingLot parkingLot, ParkingLotDTO dto) {
+            parkingLot.setName(dto.getName());
+            parkingLot.setAddress(dto.getAddress());
+            parkingLot.setLatitude(dto.getLatitude());
+            parkingLot.setLongitude(dto.getLongitude());
+            parkingLot.setStatus(dto.getStatus());
+            parkingLot.setOwnerId(dto.getOwnerId());
+            parkingLot.setProvinceId(dto.getProvinceId());
+            parkingLot.setDistrictId(dto.getDistrictId());
+            parkingLot.setWardId(dto.getWardId());
+            parkingLot.setOpenHour(dto.getOpenHour());
+            parkingLot.setCloseHour(dto.getCloseHour());
+            
+            // Update media if new image files are provided
+            if (dto.getImageFiles() != null && !dto.getImageFiles().isEmpty()) {
+                List<Media> newMedia = dto.getImageFiles().stream()
+                    .map(file -> {
+                        try {
+                            Media media = new Media();
+                            media.setTableId(parkingLot.getId());
+                            media.setTableType(Media.TableType.PARKING_LOT);
+                            media.setMediaType(Media.MediaType.IMAGE);
+                            media.setUrl(fileStorageService.storeFile(file));
+                            return media;
+                        } catch (IOException e) {
+
+                            // You might want to throw a custom exception here
+                            throw new RuntimeException("Error storing file", e);
+                        }
+                    })
+                    .collect(Collectors.toList());
+                
+                if (parkingLot.getMedia() == null) {
+                    parkingLot.setMedia(new ArrayList<>());
+                }
+                parkingLot.getMedia().addAll(newMedia);
+            }
+        }
 
     private ParkingLotDTO convertToDTO(ParkingLot parkingLot) {
         List<String> imageUrls = parkingLot.getMedia() != null
@@ -87,18 +136,23 @@ public class ParkingLotService {
                 .map(Media::getUrl)
                 .collect(Collectors.toList())
             : Collections.emptyList();
+        ParkingLotDTO dto = new ParkingLotDTO();
+        dto.setId(parkingLot.getId());
+        dto.setName(parkingLot.getName());
+        dto.setAddress(parkingLot.getAddress());
+        dto.setCapacity(1); // Assuming getCapacity() exists
+        dto.setLatitude(parkingLot.getLatitude());
+        dto.setLongitude(parkingLot.getLongitude());
+        dto.setStatus(parkingLot.getStatus());
+        dto.setImages(imageUrls);
+        dto.setOwnerId(parkingLot.getOwnerId());
+        dto.setProvinceId(parkingLot.getProvinceId());
+        dto.setDistrictId(parkingLot.getDistrictId());
+        dto.setWardId(parkingLot.getWardId());
+        dto.setOpenHour(parkingLot.getOpenHour());
+        dto.setCloseHour(parkingLot.getCloseHour());
 
-        return new ParkingLotDTO(
-            parkingLot.getId(),
-            parkingLot.getName(),
-            parkingLot.getAddress(),
-            // parkingLot.getCapacity(),
-            1,
-            parkingLot.getLatitude(),
-            parkingLot.getLongitude(),
-            parkingLot.getStatus(),
-            imageUrls
-        );
+        return dto;
     }
 
 }

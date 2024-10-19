@@ -1,16 +1,19 @@
 package com.project.parkingfinder.controller;
 
+import java.time.LocalTime;
 import java.util.List;
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.project.parkingfinder.dto.ParkingLotDTO;
 import com.project.parkingfinder.service.ParkingLotService;
@@ -26,8 +29,25 @@ public class ParkingLotController {
         this.parkingLotService = parkingLotService;
     }
 
-    @PostMapping
-    public ResponseEntity<ParkingLotDTO> createParkingLot(@RequestBody ParkingLotDTO parkingLotDTO) {
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ParkingLotDTO> createParkingLot(
+            @Valid @RequestParam("name") String name,
+            @Valid @RequestParam("address") String address,
+            @Valid @RequestParam("latitude") double latitude,
+            @Valid @RequestParam("openHour") String openHour,
+            @Valid @RequestParam("longitude") double longitude,
+            @Valid @RequestParam("closeHour") String closeHour,
+            @Valid @RequestParam("capacity") Integer capacity,
+            @RequestParam(value = "imageFiles", required = false) List<MultipartFile> imageFiles,
+            @Valid @RequestParam("ownerId") Long ownerId,
+            @Valid @RequestParam("provinceId") Long provinceId,
+            @Valid @RequestParam("districtId") Long districtId,
+            @Valid @RequestParam("wardId") Long wardId) {
+        
+        ParkingLotDTO parkingLotDTO = new ParkingLotDTO(name, address, latitude,capacity, longitude,
+                LocalTime.parse(openHour), LocalTime.parse(closeHour), imageFiles,
+                ownerId, provinceId, districtId, wardId);
+        
         ParkingLotDTO createdParkingLot = parkingLotService.createParkingLot(parkingLotDTO);
         return new ResponseEntity<>(createdParkingLot, HttpStatus.CREATED);
     }
