@@ -36,13 +36,18 @@
 #
 #
 
-
 # Cấu trúc Dockerfile mới
 FROM openjdk:17-jdk-alpine
 
 WORKDIR /app
 
+# Tạo thư mục uploads và đặt quyền
+RUN mkdir -p /app/uploads && chmod 777 /app/uploads
+
 # Copy file jar từ thư mục hiện tại vào image mới
 COPY ParkingFinder-0.0.1-SNAPSHOT.jar /app/my-app.jar
+
+# Đặt biến môi trường cho thư mục uploads
+ENV FILE_UPLOAD_DIR=/app/uploads
 
 ENTRYPOINT ["java", "-jar", "/app/my-app.jar"]

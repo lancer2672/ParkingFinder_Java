@@ -1,5 +1,7 @@
 package com.project.parkingfinder.dto;
 
+import java.util.List;
+
 import com.project.parkingfinder.enums.ParkingLotStatus;
 
 import lombok.AllArgsConstructor;
@@ -19,7 +21,6 @@ public class ParkingLotDTO {
     private double latitude;
     private double longitude;
     private ParkingLotStatus status;
-    private String imageUrl;
-//    private String imageUrls
+    private List<String> images;
 //    private String avatar
 }

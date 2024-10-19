@@ -1,9 +1,13 @@
 package com.project.parkingfinder.model;
 
 import java.time.LocalTime;
+import java.util.List;
+
+import org.hibernate.annotations.SQLRestriction;
 
 import com.project.parkingfinder.enums.ParkingLotStatus;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -11,6 +15,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
@@ -59,8 +64,9 @@ public class ParkingLot {
     @Column(name = "status")
     private ParkingLotStatus status;
     
-    @Column(name = "image_url")
-    private String imageUrl;
+    @OneToMany(mappedBy = "tableId", cascade = CascadeType.ALL, orphanRemoval = true)
+    @SQLRestriction("table_type = 'PARKING_LOT'")
+    private List<Media> media;
 
     public ParkingLot() {}
 

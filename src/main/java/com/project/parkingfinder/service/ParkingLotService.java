@@ -1,5 +1,6 @@
 package com.project.parkingfinder.service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import com.project.parkingfinder.dto.ParkingLotDTO;
 import com.project.parkingfinder.exception.ResourceNotFoundException;
+import com.project.parkingfinder.model.Media;
 import com.project.parkingfinder.model.ParkingLot;
 import com.project.parkingfinder.repository.ParkingLotRepository;
 
@@ -75,11 +77,17 @@ public class ParkingLotService {
         parkingLot.setLatitude(dto.getLatitude());
         parkingLot.setLongitude(dto.getLongitude());
         parkingLot.setStatus(dto.getStatus());
-        parkingLot.setImageUrl(dto.getImageUrl());
-        // Set other fields as needed
+    
     }
 
     private ParkingLotDTO convertToDTO(ParkingLot parkingLot) {
+        List<String> imageUrls = parkingLot.getMedia() != null
+            ? parkingLot.getMedia().stream()
+                .filter(media -> Media.MediaType.IMAGE == media.getMediaType())
+                .map(Media::getUrl)
+                .collect(Collectors.toList())
+            : Collections.emptyList();
+
         return new ParkingLotDTO(
             parkingLot.getId(),
             parkingLot.getName(),
@@ -89,7 +97,7 @@ public class ParkingLotService {
             parkingLot.getLatitude(),
             parkingLot.getLongitude(),
             parkingLot.getStatus(),
-            parkingLot.getImageUrl()
+            imageUrls
         );
     }
 
