@@ -45,9 +45,9 @@ public class ParkingLotController {
     public ResponseEntity<ParkingLotDTO> createParkingLot(
             @Valid @RequestParam("name") String name,
             @Valid @RequestParam("address") String address,
-            @Valid @RequestParam("latitude") double latitude,
+            @Valid @RequestParam("latitude") Double latitude,
             @Valid @RequestParam("openHour") String openHour,
-            @Valid @RequestParam("longitude") double longitude,
+            @Valid @RequestParam("longitude") Double longitude,
             @Valid @RequestParam("closeHour") String closeHour,
             @RequestParam(value = "imageFiles", required = false) List<MultipartFile> imageFiles,
             @Valid @RequestParam("ownerId") Long ownerId,
@@ -63,15 +63,6 @@ public class ParkingLotController {
         return new ResponseEntity<>(createdParkingLot, HttpStatus.CREATED);
     }
 
-    @GetMapping
-    public ResponseEntity<List<ParkingLotDTO>> getAllParkingLots(
-            @RequestParam(defaultValue = "10") int limit,
-            @RequestParam(defaultValue = "0") int offset) {
-        List<ParkingLotDTO> parkingLots = parkingLotService.getAllParkingLots(limit, offset);
-        return new ResponseEntity<>(parkingLots, HttpStatus.OK);
-    }
-
-   
     @GetMapping("region")
     public ResponseEntity<List<ParkingLotDTO>> getActiveParkingLotsInRegion(
             @RequestParam(name = "lat") Double latitude,
@@ -80,6 +71,7 @@ public class ParkingLotController {
         List<ParkingLotDTO> parkingLots = parkingLotService.getParkingLotsInRegion(latitude, longitude, radius);
         return new ResponseEntity<>(parkingLots, HttpStatus.OK);
     }
+
     @PostMapping("/{parkingLotId}/parking-slots")
     public ResponseEntity<ParkingSlotDTO> addParkingSlots(
             @PathVariable("parkingLotId") Long parkingLotId,
@@ -88,7 +80,6 @@ public class ParkingLotController {
         ParkingSlotDTO addedParkingSlot = parkingSlotService.addParkingSlots(parkingLotId, parkingSlotRequest.getVehicleTypeId(), parkingSlotRequest.getQuantity());
         return ResponseEntity.ok().body(addedParkingSlot);
     }
-
 
     @Setter
     @Getter
@@ -107,6 +98,15 @@ public class ParkingLotController {
             @RequestParam(name = "limit", defaultValue = "10") int limit,
             @RequestParam(name = "offset", defaultValue = "0") int offset) {
         List<ParkingLotDTO> parkingLots = parkingLotService.getParkingLotsByStatus(status, limit, offset);
+        return new ResponseEntity<>(parkingLots, HttpStatus.OK);
+    }
+
+    @GetMapping("/merchant/{merchantId}")
+    public ResponseEntity<List<ParkingLotDTO>> getParkingLotsByMerchant(
+            @PathVariable("merchantId") Long merchantId,
+            @RequestParam(name = "limit", defaultValue = "10") int limit,
+            @RequestParam(name = "offset", defaultValue = "0") int offset) {
+        List<ParkingLotDTO> parkingLots = parkingLotService.getParkingLotsByMerchant(merchantId, limit, offset);
         return new ResponseEntity<>(parkingLots, HttpStatus.OK);
     }
     @PatchMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

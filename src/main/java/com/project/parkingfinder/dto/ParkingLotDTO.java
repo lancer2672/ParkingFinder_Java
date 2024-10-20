@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.project.parkingfinder.controller.FileController;
 import com.project.parkingfinder.enums.ParkingLotStatus;
 import com.project.parkingfinder.service.LocationService;
@@ -45,7 +46,8 @@ public class ParkingLotDTO {
     @NotBlank(message = "Address is required")
     private String address;
 
-    private int capacity;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Integer capacity;
 
     @NotNull(message = "Latitude is required")
     private Double latitude;

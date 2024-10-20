@@ -71,7 +71,7 @@ public class ParkingLotService  {
         }
         savedParkingLot.setMedia(mediaList);
         // Bước 4: Trả về DTO của ParkingLot đã tạo
-        return convertToDTO(savedParkingLot);
+        return convertToDTO(savedParkingLot,0);
     }
 
     public ParkingLotDTO getParkingLotById(Long id) {
@@ -79,7 +79,7 @@ public class ParkingLotService  {
             .orElseThrow(() -> {
                 throw new ResourceNotFoundException("ParkingLot not found with id: " + id);
             });
-        return convertToDTO(parkingLot);
+        return convertToDTO(parkingLot,null);
     }
 
     @Transactional
@@ -91,7 +91,7 @@ public class ParkingLotService  {
         updateParkingLotImages(parkingLot, parkingLotDTO.getImageFiles());
         
         ParkingLot updatedParkingLot = parkingLotRepository.save(parkingLot);
-        return convertToDTO(updatedParkingLot);
+        return convertToDTO(updatedParkingLot,null);
     }
 
     private void updateParkingLotFields(ParkingLot parkingLot, ParkingLotDTO parkingLotDTO) {
@@ -144,13 +144,6 @@ public class ParkingLotService  {
         parkingLotRepository.deleteById(id);
     }
 
-    public List<ParkingLotDTO> getAllParkingLots(int limit, int offset) {
-        PageRequest pageRequest = PageRequest.of(offset, limit);
-        return parkingLotRepository.findAll(pageRequest).getContent()
-            .stream()
-            .map(this::convertToDTO)
-            .collect(Collectors.toList());
-    }
 
     public List<ParkingLotDTO> getParkingLotsInRegion(Double latitude, Double longitude, Double radius) {
         List<ParkingLotProjection> parkingLotsData = parkingLotRepository.findParkingLotsInRegionWithTotalSlots(latitude, longitude, radius);
@@ -171,6 +164,23 @@ public class ParkingLotService  {
     public List<ParkingLotDTO> getParkingLotsByStatus(ParkingLotStatus status, int limit, int offset) {
         PageRequest pageRequest = PageRequest.of(offset, limit);
         List<ParkingLotProjection> parkingLotsData = parkingLotRepository.findByStatusWithTotalSlots(status.toString(), pageRequest);
+        
+        Map<Long, ParkingLotDTO> dtoMap = new HashMap<>();
+ 
+        for (ParkingLotProjection projection : parkingLotsData) {
+            dtoMap.computeIfAbsent(projection.getId(), id -> createDTO(projection));
+            if (projection.getImageUrl() != null) {
+                String fullImageUrl = FileController.SERVER_URL + "/api/files/stream/" + projection.getImageUrl();
+                dtoMap.get(projection.getId()).getImages().add(fullImageUrl);
+            }
+        }
+
+        return new ArrayList<>(dtoMap.values());
+    }
+
+    public List<ParkingLotDTO> getParkingLotsByMerchant(Long merchantId, int limit, int offset) {
+        PageRequest pageRequest = PageRequest.of(offset, limit);
+        List<ParkingLotProjection> parkingLotsData = parkingLotRepository.findByOwnerIdWithTotalSlots(merchantId, pageRequest);
         
         Map<Long, ParkingLotDTO> dtoMap = new HashMap<>();
  
@@ -206,7 +216,7 @@ public class ParkingLotService  {
 //TODO: make polymorphism for media
     }
     
-    private ParkingLotDTO convertToDTO(ParkingLot parkingLot) {
+    private ParkingLotDTO convertToDTO(ParkingLot parkingLot, Integer capacity) {
         List<String> imageUrls = parkingLot.getMedia() != null
             ? parkingLot.getMedia().stream()
                 .filter(media -> Media.MediaType.IMAGE == media.getMediaType())
@@ -217,7 +227,7 @@ public class ParkingLotService  {
         dto.setId(parkingLot.getId());
         dto.setName(parkingLot.getName());
         dto.setAddress(parkingLot.getAddress());
-        dto.setCapacity(0); // Assuming getCapacity() exists
+        dto.setCapacity(capacity);
         dto.setLatitude(parkingLot.getLatitude());
         dto.setLongitude(parkingLot.getLongitude());
         dto.setStatus(parkingLot.getStatus());
