@@ -66,7 +66,7 @@ public class ParkingLotDTO {
 
     public void setImages(List<String> images) {
         this.images = images.stream()
-            .map(image -> FileController.SERVER_URL + "/api/files/stream/" + image)
+            .map(image -> FileController.ServerUrl + "/api/files/stream/" + image)
             .collect(Collectors.toList());
     }
 

@@ -153,7 +153,7 @@ public class ParkingLotService  {
         for (ParkingLotProjection projection : parkingLotsData) {
             dtoMap.computeIfAbsent(projection.getId(), id -> createDTO(projection));
             if (projection.getImageUrl() != null) {
-                String fullImageUrl = FileController.SERVER_URL + "/api/files/stream/" + projection.getImageUrl();
+                String fullImageUrl = FileController.ServerUrl + "/api/files/stream/" + projection.getImageUrl();
                 dtoMap.get(projection.getId()).getImages().add(fullImageUrl);
             }
         }
@@ -170,7 +170,7 @@ public class ParkingLotService  {
         for (ParkingLotProjection projection : parkingLotsData) {
             dtoMap.computeIfAbsent(projection.getId(), id -> createDTO(projection));
             if (projection.getImageUrl() != null) {
-                String fullImageUrl = FileController.SERVER_URL + "/api/files/stream/" + projection.getImageUrl();
+                String fullImageUrl = FileController.ServerUrl + "/api/files/stream/" + projection.getImageUrl();
                 dtoMap.get(projection.getId()).getImages().add(fullImageUrl);
             }
         }
@@ -187,7 +187,7 @@ public class ParkingLotService  {
         for (ParkingLotProjection projection : parkingLotsData) {
             dtoMap.computeIfAbsent(projection.getId(), id -> createDTO(projection));
             if (projection.getImageUrl() != null) {
-                String fullImageUrl = FileController.SERVER_URL + "/api/files/stream/" + projection.getImageUrl();
+                String fullImageUrl = FileController.ServerUrl + "/api/files/stream/" + projection.getImageUrl();
                 dtoMap.get(projection.getId()).getImages().add(fullImageUrl);
             }
         }

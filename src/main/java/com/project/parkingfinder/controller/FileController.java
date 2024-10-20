@@ -3,6 +3,7 @@ package com.project.parkingfinder.controller;
 import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +20,8 @@ import com.project.parkingfinder.service.FileStorageService;
 @RequestMapping("/api/files")
 public class FileController {
 
-    public static final String SERVER_URL = "http://localhost:8080"; // Adjust this URL as needed
+    @Value("${server.url}")
+    public static String ServerUrl;
     
     @Autowired
     private FileStorageService fileStorageService;
@@ -28,7 +30,7 @@ public class FileController {
     public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) {
         try {
             String fileName = fileStorageService.storeFile(file);
-            String fileUrl = SERVER_URL + "/api/files/stream/" + fileName;
+            String fileUrl = ServerUrl + "/api/files/stream/" + fileName;
             return ResponseEntity.ok("File uploaded successfully: " + fileUrl);
         } catch (IOException e) {
             return ResponseEntity.badRequest().body("Failed to upload file: " + e.getMessage());
