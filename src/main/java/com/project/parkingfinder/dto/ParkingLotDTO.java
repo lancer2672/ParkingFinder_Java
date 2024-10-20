@@ -64,12 +64,6 @@ public class ParkingLotDTO {
     private ParkingLotStatus status;
     private List<String> images;
 
-    public void setImages(List<String> images) {
-        this.images = images.stream()
-            .map(image -> FileController.ServerUrl + "/api/files/stream/" + image)
-            .collect(Collectors.toList());
-    }
-
     @JsonIgnore
     private List<MultipartFile> imageFiles;
 

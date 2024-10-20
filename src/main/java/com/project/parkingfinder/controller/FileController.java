@@ -20,9 +20,6 @@ import com.project.parkingfinder.service.FileStorageService;
 @RequestMapping("/api/files")
 public class FileController {
 
-    @Value("${server.url}")
-    public static String ServerUrl;
-    
     @Autowired
     private FileStorageService fileStorageService;
 
@@ -30,8 +27,8 @@ public class FileController {
     public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) {
         try {
             String fileName = fileStorageService.storeFile(file);
-            String fileUrl = ServerUrl + "/api/files/stream/" + fileName;
-            return ResponseEntity.ok("File uploaded successfully: " + fileUrl);
+
+            return ResponseEntity.ok("File uploaded successfully: " + fileName);
         } catch (IOException e) {
             return ResponseEntity.badRequest().body("Failed to upload file: " + e.getMessage());
         }
