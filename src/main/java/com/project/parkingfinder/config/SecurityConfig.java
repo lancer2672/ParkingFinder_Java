@@ -21,6 +21,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.project.parkingfinder.security.JwtAuthenticationFilter;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
@@ -44,7 +45,15 @@ public class SecurityConfig {
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(exceptions -> exceptions
                         .accessDeniedHandler(accessDeniedHandler())
-                        .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            if (authException.getCause() instanceof ExpiredJwtException) {
+                                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                                response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                                response.getWriter().write("{\"error\": \"Token Expired\", \"message\": \"Your session has expired. Please log in again.\"}");
+                            } else {
+                                new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED).commence(request, response, authException);
+                            }
+                        })
                 )
                 .build();
     }
