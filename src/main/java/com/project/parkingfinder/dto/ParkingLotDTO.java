@@ -2,10 +2,12 @@ package com.project.parkingfinder.dto;
 
 import java.time.LocalTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.project.parkingfinder.controller.FileController;
 import com.project.parkingfinder.enums.ParkingLotStatus;
 import com.project.parkingfinder.service.LocationService;
 
@@ -58,8 +60,13 @@ public class ParkingLotDTO {
     private LocalTime closeHour;
 
     private ParkingLotStatus status;
-
     private List<String> images;
+
+    public void setImages(List<String> images) {
+        this.images = images.stream()
+            .map(image -> FileController.SERVER_URL + "/api/files/stream/" + image)
+            .collect(Collectors.toList());
+    }
 
     @JsonIgnore
     private List<MultipartFile> imageFiles;

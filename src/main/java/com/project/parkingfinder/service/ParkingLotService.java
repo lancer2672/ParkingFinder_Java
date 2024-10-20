@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.project.parkingfinder.controller.FileController;
 import com.project.parkingfinder.dto.ParkingLotDTO;
 import com.project.parkingfinder.dto.ParkingLotProjection;
 import com.project.parkingfinder.enums.ParkingLotStatus;
@@ -68,7 +69,7 @@ public class ParkingLotService  {
         if (!mediaList.isEmpty()) {
             mediaRepository.saveAll(mediaList);
         }
-
+        savedParkingLot.setMedia(mediaList);
         // Bước 4: Trả về DTO của ParkingLot đã tạo
         return convertToDTO(savedParkingLot);
     }
@@ -113,7 +114,8 @@ public class ParkingLotService  {
         for (ParkingLotProjection projection : parkingLotsData) {
             dtoMap.computeIfAbsent(projection.getId(), id -> createDTO(projection));
             if (projection.getImageUrl() != null) {
-                dtoMap.get(projection.getId()).getImages().add(projection.getImageUrl());
+                String fullImageUrl = FileController.SERVER_URL + "/api/files/stream/" + projection.getImageUrl();
+                dtoMap.get(projection.getId()).getImages().add(fullImageUrl);
             }
         }
 
@@ -160,7 +162,7 @@ public class ParkingLotService  {
         dto.setId(parkingLot.getId());
         dto.setName(parkingLot.getName());
         dto.setAddress(parkingLot.getAddress());
-        dto.setCapacity(1); // Assuming getCapacity() exists
+        dto.setCapacity(0); // Assuming getCapacity() exists
         dto.setLatitude(parkingLot.getLatitude());
         dto.setLongitude(parkingLot.getLongitude());
         dto.setStatus(parkingLot.getStatus());

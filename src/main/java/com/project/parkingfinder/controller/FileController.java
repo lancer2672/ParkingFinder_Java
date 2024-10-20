@@ -15,11 +15,12 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.project.parkingfinder.service.FileStorageService;
-
 @RestController
 @RequestMapping("/api/files")
 public class FileController {
 
+    public static final String SERVER_URL = "http://localhost:8080"; // Adjust this URL as needed
+    
     @Autowired
     private FileStorageService fileStorageService;
 
@@ -27,14 +28,15 @@ public class FileController {
     public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) {
         try {
             String fileName = fileStorageService.storeFile(file);
-            return ResponseEntity.ok("File uploaded successfully: " + fileName);
+            String fileUrl = SERVER_URL + "/api/files/stream/" + fileName;
+            return ResponseEntity.ok("File uploaded successfully: " + fileUrl);
         } catch (IOException e) {
             return ResponseEntity.badRequest().body("Failed to upload file: " + e.getMessage());
         }
     }
 
     @GetMapping("/stream/{fileName:.+}")
-    public ResponseEntity<Resource> streamFile(@PathVariable String fileName) {
+    public ResponseEntity<Resource> streamFile(@PathVariable("fileName") String fileName) {
         Resource resource = fileStorageService.loadFileAsResource(fileName);
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + resource.getFilename() + "\"")
