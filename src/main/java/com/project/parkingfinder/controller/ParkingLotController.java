@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -107,5 +108,39 @@ public class ParkingLotController {
             @RequestParam(name = "offset", defaultValue = "0") int offset) {
         List<ParkingLotDTO> parkingLots = parkingLotService.getParkingLotsByStatus(status, limit, offset);
         return new ResponseEntity<>(parkingLots, HttpStatus.OK);
+    }
+    @PatchMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ParkingLotDTO> updateParkingLot(
+            @PathVariable("id") Long id,
+            @Valid @RequestParam(value = "name", required = false) String name,
+            @Valid @RequestParam(value = "address", required = false) String address,
+            @Valid @RequestParam(value = "latitude", required = false) Double latitude,
+            @Valid @RequestParam(value = "longitude", required = false) Double longitude,
+            @Valid @RequestParam(value = "openHour", required = false) String openHour,
+            @Valid @RequestParam(value = "closeHour", required = false) String closeHour,
+            @RequestParam(value = "imageFiles", required = false) List<MultipartFile> imageFiles,
+            @Valid @RequestParam(value = "ownerId", required = false) Long ownerId,
+            @Valid @RequestParam(value = "provinceId", required = false) String provinceId,
+            @Valid @RequestParam(value = "districtId", required = false) String districtId,
+            @Valid @RequestParam(value = "wardId", required = false) String wardId,
+            @Valid @RequestParam(value = "status", required = false) ParkingLotStatus status) {
+        
+        ParkingLotDTO parkingLotDTO = new ParkingLotDTO();
+        parkingLotDTO.setId(id);
+        parkingLotDTO.setName(name);
+        parkingLotDTO.setAddress(address);
+        parkingLotDTO.setLatitude(latitude);
+        parkingLotDTO.setLongitude(longitude);
+        parkingLotDTO.setOpenHour(openHour != null ? LocalTime.parse(openHour) : null);
+        parkingLotDTO.setCloseHour(closeHour != null ? LocalTime.parse(closeHour) : null);
+        parkingLotDTO.setImageFiles(imageFiles);
+        parkingLotDTO.setOwnerId(ownerId);
+        parkingLotDTO.setProvinceId(provinceId);
+        parkingLotDTO.setDistrictId(districtId);
+        parkingLotDTO.setWardId(wardId);
+        parkingLotDTO.setStatus(status);
+        
+        ParkingLotDTO updatedParkingLot = parkingLotService.updateParkingLot(parkingLotDTO);
+        return new ResponseEntity<>(updatedParkingLot, HttpStatus.OK);
     }
 }

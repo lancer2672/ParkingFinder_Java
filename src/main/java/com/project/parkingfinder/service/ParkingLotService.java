@@ -82,13 +82,59 @@ public class ParkingLotService  {
         return convertToDTO(parkingLot);
     }
 
-    public ParkingLotDTO updateParkingLot(Long id, ParkingLotDTO parkingLotDTO) {
-        ParkingLot parkingLot = parkingLotRepository.findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("ParkingLot not found with id: " + id));
+    @Transactional
+    public ParkingLotDTO updateParkingLot(ParkingLotDTO parkingLotDTO) {
+        ParkingLot parkingLot = parkingLotRepository.findById(parkingLotDTO.getId())
+            .orElseThrow(() -> new ResourceNotFoundException("ParkingLot not found with id: " + parkingLotDTO.getId()));
         
-        updateParkingLotFromDTO(parkingLot, parkingLotDTO);
+        updateParkingLotFields(parkingLot, parkingLotDTO);
+        updateParkingLotImages(parkingLot, parkingLotDTO.getImageFiles());
+        
         ParkingLot updatedParkingLot = parkingLotRepository.save(parkingLot);
         return convertToDTO(updatedParkingLot);
+    }
+
+    private void updateParkingLotFields(ParkingLot parkingLot, ParkingLotDTO parkingLotDTO) {
+        if (parkingLotDTO.getName() != null) parkingLot.setName(parkingLotDTO.getName());
+        if (parkingLotDTO.getAddress() != null) parkingLot.setAddress(parkingLotDTO.getAddress());
+        if (parkingLotDTO.getLatitude() != null) parkingLot.setLatitude(parkingLotDTO.getLatitude());
+        if (parkingLotDTO.getLongitude() != null) parkingLot.setLongitude(parkingLotDTO.getLongitude());
+        if (parkingLotDTO.getOpenHour() != null) parkingLot.setOpenHour(parkingLotDTO.getOpenHour());
+        if (parkingLotDTO.getCloseHour() != null) parkingLot.setCloseHour(parkingLotDTO.getCloseHour());
+        if (parkingLotDTO.getOwnerId() != null) parkingLot.setOwnerId(parkingLotDTO.getOwnerId());
+        if (parkingLotDTO.getProvinceId() != null) parkingLot.setProvinceId(parkingLotDTO.getProvinceId());
+        if (parkingLotDTO.getDistrictId() != null) parkingLot.setDistrictId(parkingLotDTO.getDistrictId());
+        if (parkingLotDTO.getWardId() != null) parkingLot.setWardId(parkingLotDTO.getWardId());
+        if (parkingLotDTO.getStatus() != null) parkingLot.setStatus(parkingLotDTO.getStatus());
+    }
+
+    private void updateParkingLotImages(ParkingLot parkingLot, List<MultipartFile> imageFiles) {
+        if (imageFiles != null && !imageFiles.isEmpty()) {
+            List<Media> newMediaList = createMediaList(parkingLot.getId(), imageFiles);
+            mediaRepository.deleteByTableIdAndTableType(parkingLot.getId(), Media.TableType.PARKING_LOT.toString());
+            mediaRepository.saveAll(newMediaList);
+            parkingLot.setMedia(newMediaList);
+        }
+    }
+
+    private List<Media> createMediaList(Long parkingLotId, List<MultipartFile> imageFiles) {
+        return imageFiles.stream()
+            .map(file -> createMedia(parkingLotId, file))
+            .collect(Collectors.toList());
+    }
+
+    private Media createMedia(Long parkingLotId, MultipartFile file) {
+        try {
+            String imageUrl = fileStorageService.storeFile(file);
+            Media media = new Media();
+            media.setTableId(parkingLotId);
+            media.setTableType(Media.TableType.PARKING_LOT);
+            media.setMediaType(Media.MediaType.IMAGE);
+            media.setUrl(imageUrl);
+            return media;
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to store file", e);
+        }
     }
 
     public void deleteParkingLot(Long id) {
@@ -110,7 +156,7 @@ public class ParkingLotService  {
         List<ParkingLotProjection> parkingLotsData = parkingLotRepository.findParkingLotsInRegionWithTotalSlots(latitude, longitude, radius);
         
         Map<Long, ParkingLotDTO> dtoMap = new HashMap<>();
-
+ 
         for (ParkingLotProjection projection : parkingLotsData) {
             dtoMap.computeIfAbsent(projection.getId(), id -> createDTO(projection));
             if (projection.getImageUrl() != null) {
@@ -124,10 +170,19 @@ public class ParkingLotService  {
 
     public List<ParkingLotDTO> getParkingLotsByStatus(ParkingLotStatus status, int limit, int offset) {
         PageRequest pageRequest = PageRequest.of(offset, limit);
-        List<ParkingLot> parkingLots = parkingLotRepository.findByStatus(status, pageRequest);
-        return parkingLots.stream()
-            .map(this::convertToDTO)
-            .collect(Collectors.toList());
+        List<ParkingLotProjection> parkingLotsData = parkingLotRepository.findByStatusWithTotalSlots(status.toString(), pageRequest);
+        
+        Map<Long, ParkingLotDTO> dtoMap = new HashMap<>();
+ 
+        for (ParkingLotProjection projection : parkingLotsData) {
+            dtoMap.computeIfAbsent(projection.getId(), id -> createDTO(projection));
+            if (projection.getImageUrl() != null) {
+                String fullImageUrl = FileController.SERVER_URL + "/api/files/stream/" + projection.getImageUrl();
+                dtoMap.get(projection.getId()).getImages().add(fullImageUrl);
+            }
+        }
+
+        return new ArrayList<>(dtoMap.values());
     }
 
     private ParkingLot convertToEntity(ParkingLotDTO dto) {

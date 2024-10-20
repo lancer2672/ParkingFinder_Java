@@ -25,10 +25,14 @@ public interface ParkingLotRepository extends JpaRepository<ParkingLot, Long> {
        List<ParkingLotProjection> findParkingLotsInRegionWithTotalSlots(@Param("latitude") Double latitude,
                                                                         @Param("longitude") Double longitude,
                                                                         @Param("radius") Double radius);
-    @Query(value = "SELECT pl FROM ParkingLot pl WHERE pl.status = :status",
-           countQuery = "SELECT COUNT(pl) FROM ParkingLot pl WHERE pl.status = :status")
-    List<ParkingLot> findByStatus(@Param("status") ParkingLotStatus status, Pageable pageable);
-
+    @Query(value = "SELECT pl.*, " +
+           "COALESCE((SELECT SUM(ps.active_slots) FROM parking_slots ps WHERE ps.parking_lot_id = pl.id), 0) AS total_parking_slots, " +
+           "m.url AS image_url " +
+           "FROM parking_lots pl " +
+           "LEFT JOIN medias m ON m.table_id = pl.id AND m.table_type = 'PARKING_LOT' AND m.media_type = 'IMAGE' " +
+           "WHERE pl.status = :status",
+           nativeQuery = true)
+    List<ParkingLotProjection> findByStatusWithTotalSlots(@Param("status") String status, Pageable pageable);
 
 
 }
