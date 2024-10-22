@@ -95,8 +95,8 @@ public class ParkingLotController {
     @GetMapping("/status")
     public ResponseEntity<List<ParkingLotDTO>> getParkingLotsByStatus(
             @RequestParam(name = "status") ParkingLotStatus status,
-            @RequestParam(name = "page", defaultValue = "10") int page,
-            @RequestParam(name = "size", defaultValue = "0") int size) {
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size) {
         List<ParkingLotDTO> parkingLots = parkingLotService.getParkingLotsByStatus(status, page, size);
         return new ResponseEntity<>(parkingLots, HttpStatus.OK);
     }
@@ -104,8 +104,8 @@ public class ParkingLotController {
     @GetMapping("/merchant/{merchantId}")
     public ResponseEntity<List<ParkingLotDTO>> getParkingLotsByMerchant(
             @PathVariable("merchantId") Long merchantId,
-            @RequestParam(name = "page", defaultValue = "10") int page,
-            @RequestParam(name = "size", defaultValue = "0") int size) {
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size) {
         List<ParkingLotDTO> parkingLots = parkingLotService.getParkingLotsByMerchant(merchantId, page, size);
         return new ResponseEntity<>(parkingLots, HttpStatus.OK);
     }

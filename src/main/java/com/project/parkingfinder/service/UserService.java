@@ -41,7 +41,7 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("Merchant role not found"))
                 .getId();
         
-        return userRepository.findByRoleId(merchantRoleId, 
+        return userRepository.findByRoleIdAndStatus(merchantRoleId, status, 
                 org.springframework.data.domain.PageRequest.of(page,size))
                 .getContent();
     }

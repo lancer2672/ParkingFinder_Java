@@ -51,8 +51,8 @@ public class UserController {
 
     @GetMapping("/merchants")
     public ResponseEntity<List<User>> getMerchants(
-            @RequestParam(name = "size", defaultValue = "0") int size,
-            @RequestParam(name = "page", defaultValue = "10") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size,
+            @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "status", required = false) String status) {
         List<User> merchants = userService.getMerchants(size, page, status);
         return ResponseEntity.ok(merchants);

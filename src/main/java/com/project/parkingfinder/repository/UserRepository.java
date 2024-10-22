@@ -19,10 +19,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findByEmail(String email);
 
     Optional<User> findUserByPhoneNumber(String phoneNumber);
-    
-    @Query(value = "SELECT * FROM users WHERE role_id = :roleId", 
-           countQuery = "SELECT count(*) FROM users WHERE role_id = :roleId",
+ 
+    @Query(value = "SELECT * FROM users WHERE role_id = :roleId AND status = :status", 
+           countQuery = "SELECT count(*) FROM users WHERE role_id = :roleId AND status = :status",
            nativeQuery = true)
-    Page<User> findByRoleId(@Param("roleId") Long roleId, Pageable pageable);
+    Page<User> findByRoleIdAndStatus(@Param("roleId") Long roleId, @Param("status") String status, Pageable pageable);
 
 }

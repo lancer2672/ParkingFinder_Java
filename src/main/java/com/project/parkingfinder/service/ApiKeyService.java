@@ -18,7 +18,7 @@ public class ApiKeyService {
 
     public ApiKeyService() throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
-        ClassPathResource resource = new ClassPathResource("api-keys.json");
+        ClassPathResource resource = new ClassPathResource("api_key.json");
         this.apiKeys = objectMapper.readValue(resource.getInputStream(), new TypeReference<List<Map<String, String>>>() {});
     }
 
