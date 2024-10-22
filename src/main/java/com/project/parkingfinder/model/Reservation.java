@@ -3,6 +3,7 @@ package com.project.parkingfinder.model;
 import java.time.LocalDateTime;
 
 import com.project.parkingfinder.enums.ReservationStatus;
+import com.project.parkingfinder.enums.VehicleTypeEnum;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -44,5 +45,10 @@ public class Reservation {
 
     private LocalDateTime checkInTime;
     private LocalDateTime checkOutTime;
+
+    @Enumerated(EnumType.STRING)
+    private VehicleTypeEnum carType;
+
+    private Double price;
 
 }

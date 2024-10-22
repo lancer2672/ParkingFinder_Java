@@ -34,6 +34,7 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        //TODO: spring boot security (role,..)
         return http
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Enable CORS
@@ -56,7 +57,7 @@ public class SecurityConfig {
                         })
                 )
                 .build();
-    }
+    } 
 
     @Bean
     public AccessDeniedHandler accessDeniedHandler() {

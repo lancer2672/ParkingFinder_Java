@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.project.parkingfinder.controller.FileController;
 import com.project.parkingfinder.dto.ParkingLotDTO;
 import com.project.parkingfinder.dto.ParkingLotProjection;
 import com.project.parkingfinder.enums.ParkingLotStatus;
@@ -160,8 +159,8 @@ public class ParkingLotService  {
         return new ArrayList<>(dtoMap.values());
     }
 
-    public List<ParkingLotDTO> getParkingLotsByStatus(ParkingLotStatus status, int limit, int offset) {
-        PageRequest pageRequest = PageRequest.of(offset, limit);
+    public List<ParkingLotDTO> getParkingLotsByStatus(ParkingLotStatus status, int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page, size);
         List<ParkingLotProjection> parkingLotsData = parkingLotRepository.findByStatusWithTotalSlots(status.toString(), pageRequest);
         
         Map<Long, ParkingLotDTO> dtoMap = new HashMap<>();
@@ -177,8 +176,8 @@ public class ParkingLotService  {
         return new ArrayList<>(dtoMap.values());
     }
 
-    public List<ParkingLotDTO> getParkingLotsByMerchant(Long merchantId, int limit, int offset) {
-        PageRequest pageRequest = PageRequest.of(offset, limit);
+    public List<ParkingLotDTO> getParkingLotsByMerchant(Long merchantId, int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page, size);
         List<ParkingLotProjection> parkingLotsData = parkingLotRepository.findByOwnerIdWithTotalSlots(merchantId, pageRequest);
         
         Map<Long, ParkingLotDTO> dtoMap = new HashMap<>();

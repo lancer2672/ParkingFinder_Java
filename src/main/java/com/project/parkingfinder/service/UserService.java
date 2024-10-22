@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import com.project.parkingfinder.dto.LoginResponse;
 import com.project.parkingfinder.enums.RoleEnum;
 import com.project.parkingfinder.model.User;
+import com.project.parkingfinder.repository.RoleRepository;
 import com.project.parkingfinder.repository.UserRepository;
 import com.project.parkingfinder.security.JwtTokenProvider;
 
@@ -18,6 +19,10 @@ public class UserService {
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private RoleRepository roleRepository;
+
+    
     private final JwtTokenProvider jwtTokenProvider;
 
     @Autowired
@@ -30,6 +35,17 @@ public class UserService {
     public User getUser(Long id) {
         return userRepository.findById(id).orElse(null);
     }
+
+    public List<User> getMerchants(int size, int page, String status) {
+        Long merchantRoleId = roleRepository.findByName(RoleEnum.MERCHANT.name())
+                .orElseThrow(() -> new RuntimeException("Merchant role not found"))
+                .getId();
+        
+        return userRepository.findByRoleId(merchantRoleId, 
+                org.springframework.data.domain.PageRequest.of(page,size))
+                .getContent();
+    }
+    
     public List<User> getAllUsers(){
         return userRepository.findAll();
     }
@@ -76,4 +92,5 @@ public class UserService {
         Optional<User> optionalUser = userRepository.findUserByPhoneNumber(phoneNumber);
         return optionalUser.isPresent();
     }
+    
 }

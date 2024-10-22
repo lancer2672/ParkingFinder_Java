@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.project.parkingfinder.dto.LoginResponse;
@@ -46,6 +47,15 @@ public class UserController {
         } else {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @GetMapping("/merchants")
+    public ResponseEntity<List<User>> getMerchants(
+            @RequestParam(name = "size", defaultValue = "0") int size,
+            @RequestParam(name = "page", defaultValue = "10") int page,
+            @RequestParam(name = "status", required = false) String status) {
+        List<User> merchants = userService.getMerchants(size, page, status);
+        return ResponseEntity.ok(merchants);
     }
 
     @GetMapping

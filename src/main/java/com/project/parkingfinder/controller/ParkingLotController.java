@@ -95,18 +95,18 @@ public class ParkingLotController {
     @GetMapping("/status")
     public ResponseEntity<List<ParkingLotDTO>> getParkingLotsByStatus(
             @RequestParam(name = "status") ParkingLotStatus status,
-            @RequestParam(name = "limit", defaultValue = "10") int limit,
-            @RequestParam(name = "offset", defaultValue = "0") int offset) {
-        List<ParkingLotDTO> parkingLots = parkingLotService.getParkingLotsByStatus(status, limit, offset);
+            @RequestParam(name = "page", defaultValue = "10") int page,
+            @RequestParam(name = "size", defaultValue = "0") int size) {
+        List<ParkingLotDTO> parkingLots = parkingLotService.getParkingLotsByStatus(status, page, size);
         return new ResponseEntity<>(parkingLots, HttpStatus.OK);
     }
 
     @GetMapping("/merchant/{merchantId}")
     public ResponseEntity<List<ParkingLotDTO>> getParkingLotsByMerchant(
             @PathVariable("merchantId") Long merchantId,
-            @RequestParam(name = "limit", defaultValue = "10") int limit,
-            @RequestParam(name = "offset", defaultValue = "0") int offset) {
-        List<ParkingLotDTO> parkingLots = parkingLotService.getParkingLotsByMerchant(merchantId, limit, offset);
+            @RequestParam(name = "page", defaultValue = "10") int page,
+            @RequestParam(name = "size", defaultValue = "0") int size) {
+        List<ParkingLotDTO> parkingLots = parkingLotService.getParkingLotsByMerchant(merchantId, page, size);
         return new ResponseEntity<>(parkingLots, HttpStatus.OK);
     }
     @PatchMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
