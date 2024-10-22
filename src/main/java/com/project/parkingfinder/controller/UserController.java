@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.project.parkingfinder.dto.LoginResponse;
 import com.project.parkingfinder.enums.RoleEnum;
+import com.project.parkingfinder.enums.UserStatus;
 import com.project.parkingfinder.model.Role;
 import com.project.parkingfinder.model.User;
 import com.project.parkingfinder.service.RoleService;
@@ -119,14 +121,36 @@ public class UserController {
         return ResponseEntity.ok(convertToResponseDTO(createdUser));
     }
 
+    @PatchMapping("/{id}")
+    public ResponseEntity<?> updateUser(@PathVariable("id") Long id, @Valid @RequestBody UpdateUserRequest updateUserRequest) {
+        User existingUser = userService.getUser(id);
+        if (existingUser == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        if (updateUserRequest.getName() != null) {
+            existingUser.setName(updateUserRequest.getName());
+        }
+        if (updateUserRequest.getEmail() != null) {
+            existingUser.setEmail(updateUserRequest.getEmail());
+        }
+        if (updateUserRequest.getPassword() != null) {
+            existingUser.setPassword(updateUserRequest.getPassword()); // Remember to hash the password
+        }
+        if (updateUserRequest.getStatus() != null) {
+            existingUser.setStatus(updateUserRequest.getStatus());
+        }   
+
+        User updatedUser = userService.saveUser(existingUser);
+        return ResponseEntity.ok(convertToResponseDTO(updatedUser));
+    }
+
     private void validateSignUpRequest(SignUpRequest signUpRequest) {
         boolean isValidRole = RoleEnum.isValidRole(signUpRequest.getRole());
         if (!isValidRole) {
             throw new IllegalArgumentException("Invalid role: " + signUpRequest.getRole());
         }
     }
-
-
 
     private User createUser(SignUpRequest signUpRequest) {
         User newUser = new User();
@@ -149,10 +173,9 @@ public class UserController {
         responseDTO.setId(user.getId());
         responseDTO.setName(user.getName());
         responseDTO.setEmail(user.getEmail());
-
+        responseDTO.setStatus(user.getStatus());    
         return responseDTO;
     }
-
 
     @Data
     public class UserResponseDTO {
@@ -172,7 +195,6 @@ public class UserController {
 
     @Data
     public static class SignUpRequest {
-
         @NotBlank(message = "Phone number is required")
         private String phoneNumber;
 
@@ -189,8 +211,17 @@ public class UserController {
 
         @NotBlank(message = "Role is required")
         private String role;
-        // Getters and Setters
     }
 
-}
+    @Data
+    public static class UpdateUserRequest {
+        @Size(min = 6, message = "Password must be at least 6 characters")
+        private String password;
 
+        @Email(message = "Email should be valid")
+        private String email;
+
+        private String name;
+        private UserStatus status;
+    }
+}
