@@ -49,10 +49,10 @@ public class FileStorageService {
             if (resource.exists()) {
                 return resource;
             } else {
-                throw new RuntimeException("File not found: " + fileName);
+                throw new RuntimeException("Không tìm thấy file: " + fileName);
             }
         } catch (MalformedURLException ex) {
-            throw new RuntimeException("File not found: " + fileName, ex);
+            throw new RuntimeException("Không tìm thấy file: " + fileName, ex);
         }
     }
 }
