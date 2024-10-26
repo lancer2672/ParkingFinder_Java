@@ -4,5 +4,18 @@ public enum ReservationStatus {
     PENDING,
     CHECKED_IN,
     CHECKED_OUT,
-    CANCELLED
+    CANCELLED;
+
+    public static boolean isValid(String status) {
+        if (status == null) {
+            return false;
+        }
+        for (ReservationStatus reservationStatus : ReservationStatus.values()) {
+            if (reservationStatus.name().equalsIgnoreCase(status)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }

@@ -88,11 +88,11 @@ public class ParkingLotController {
     @Setter
     @Getter
     public static class ParkingSlotRequest {
-        @NotNull(message = "Vehicle type ID is required")
+        @NotNull(message = "ID loại xe là bắt buộc")
         private Long vehicleTypeId;
 
-        @NotNull(message = "Quantity is required")
-        @Positive(message = "Quantity must be positive")
+        @NotNull(message = "Số lượng là bắt buộc")
+        @Positive(message = "Số lượng phải là số dương")
         private Integer quantity;
     }
 
@@ -133,7 +133,7 @@ public class ParkingLotController {
     }
     @PatchMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ParkingLotDTO> updateParkingLot(
-            @PathVariable("id") Long id,
+            @PathVariable("id") Long id,    
             @Valid @RequestParam(value = "name", required = false) String name,
             @Valid @RequestParam(value = "address", required = false) String address,
             @Valid @RequestParam(value = "latitude", required = false) Double latitude,

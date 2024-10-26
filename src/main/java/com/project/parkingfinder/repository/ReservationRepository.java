@@ -3,6 +3,8 @@ package com.project.parkingfinder.repository;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -20,4 +22,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     Optional<Long> countReservationsInTimeRange(@Param("parkingSlotId") Long parkingSlotId,
                                                 @Param("checkIn") LocalDateTime checkIn,
                                                 @Param("checkOut") LocalDateTime checkOut);
+
+    @Query("SELECT r FROM Reservation r WHERE r.user.id = :userId ORDER BY r.checkInTime DESC")
+    Page<Reservation> findByUserId(@Param("userId") Long userId, Pageable pageable);
 }

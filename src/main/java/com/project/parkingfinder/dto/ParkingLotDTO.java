@@ -24,39 +24,39 @@ import lombok.Setter;
 public class ParkingLotDTO {
     private Long id;
 
-    @NotNull(message = "Owner ID is required")
+    @NotNull(message = "ID chủ sở hữu là bắt buộc")
     private Long ownerId;
-    @NotNull(message = "Province ID is required")
+    @NotNull(message = "ID tỉnh là bắt buộc")
     private String provinceId;
     private String provinceName;
 
-    @NotNull(message = "District ID is required")
+    @NotNull(message = "ID quận là bắt buộc")
     private String districtId;
     private String districtName;
 
-    @NotNull(message = "Ward ID is required")
+    @NotNull(message = "ID phường là bắt buộc")
     private String wardId;
     private String wardName;
 
-    @NotBlank(message = "Name is required")
+    @NotBlank(message = "Tên là bắt buộc")
     private String name;
 
-    @NotBlank(message = "Address is required")
+    @NotBlank(message = "Địa chỉ là bắt buộc")
     private String address;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Integer capacity;
 
-    @NotNull(message = "Latitude is required")
+    @NotNull(message = "Vĩ độ là bắt buộc")
     private Double latitude;
 
-    @NotNull(message = "Longitude is required")
+    @NotNull(message = "Kinh độ là bắt buộc")
     private Double longitude;
 
-    @NotBlank(message = "Open hour is required")
+    @NotBlank(message = "Giờ mở cửa là bắt buộc")
     private LocalTime openHour;
 
-    @NotBlank(message = "Close hour is required")
+    @NotBlank(message = "Giờ đóng cửa là bắt buộc")
     private LocalTime closeHour;
 
     private ParkingLotStatus status;

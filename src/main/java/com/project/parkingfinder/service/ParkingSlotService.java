@@ -30,10 +30,10 @@ public class ParkingSlotService {
     public ParkingSlotDTO addParkingSlots(Long parkingLotId, Long vehicleTypeId, Integer quantity) {
 
         VehicleType vehicleType = vehicleTypeRepository.findById(vehicleTypeId)
-            .orElseThrow(() -> new ResourceNotFoundException("Vehicle type not found with id: " + vehicleTypeId));
+            .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy loại xe với id: " + vehicleTypeId));
 
         parkingLotRepository.findById(parkingLotId)
-            .orElseThrow(() -> new ResourceNotFoundException("Parking lot not found with id: " + parkingLotId));
+            .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy bãi đỗ xe với id: " + parkingLotId));
 
         ParkingSlot parkingSlot = new ParkingSlot();
         parkingSlot.setParkingLotId(parkingLotId);

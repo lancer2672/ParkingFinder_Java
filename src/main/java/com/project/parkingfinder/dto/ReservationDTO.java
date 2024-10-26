@@ -14,16 +14,17 @@ public class ReservationDTO {
     //  NULL nếu khách vãng lai
     private Long userId;
 
-    @NotNull(message = "Parking lot ID is required")
+    // Không nên dùng DTO làm 1 request struct
+    @NotNull(message = "ID bãi đậu xe là bắt buộc")
     private Long parkingLotId;
 
-    @NotNull(message = "Start time is required")
+    @NotNull(message = "Thời gian bắt đầu là bắt buộc")
     private LocalDateTime startTime;
 
-    @NotNull(message = "End time is required")
+    @NotNull(message = "Thời gian kết thúc là bắt buộc")
     private LocalDateTime endTime;
 
-    @NotNull(message = "Vehicle type is required")
+    @NotNull(message = "Loại xe là bắt buộc")
     private String vehicleType;
 
     private Double totalPrice;

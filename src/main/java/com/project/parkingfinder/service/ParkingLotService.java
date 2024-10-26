@@ -45,38 +45,32 @@ public class ParkingLotService  {
 
     @Transactional
     public ParkingLotDTO createParkingLot(ParkingLotDTO parkingLotDTO) {
-        // Tạo đối tượng ParkingLot từ DTO
         ParkingLot parkingLot = convertToEntity(parkingLotDTO);
-        // Bước 1: Lưu ParkingLot trước để có được ID
         ParkingLot savedParkingLot = parkingLotRepository.save(parkingLot);
         
-        // In ra saved ID
         System.out.println("Saved ParkingLot ID: " + savedParkingLot.getId());
-        // Bước 2: Xử lý file và tạo danh sách Media
+        
         List<Media> mediaList = new ArrayList<>();
         if (parkingLotDTO.getImageFiles() != null && !parkingLotDTO.getImageFiles().isEmpty()) {
             for (MultipartFile file : parkingLotDTO.getImageFiles()) {
                 try {
-                    // Lưu file và tạo Media
                     String imageUrl = fileStorageService.storeFile(file);
                     Media media = new Media();
-                    media.setTableId(savedParkingLot.getId()); // Gán id của ParkingLot
+                    media.setTableId(savedParkingLot.getId());
                     media.setTableType(Media.TableType.PARKING_LOT);
                     media.setMediaType(Media.MediaType.IMAGE);
                     media.setUrl(imageUrl);
                     mediaList.add(media);
                 } catch (IOException e) {
-                    throw new RuntimeException("Failed to store file", e);
+                    throw new RuntimeException("Lỗi khi lưu file", e);
                 }
             }
         }
 
-        // Bước 3: Lưu Media vào cơ sở dữ liệu
         if (!mediaList.isEmpty()) {
             mediaRepository.saveAll(mediaList);
         }
         savedParkingLot.setMedia(mediaList);
-        // Bước 4: Trả về DTO của ParkingLot đã tạo
         return convertToDTO(savedParkingLot,0);
     }
 
@@ -96,13 +90,13 @@ public class ParkingLotService  {
             return vehicles;
         }catch( Exception e){
             System.out.println(e);
-            throw new InternalException("Lỗi khi lấy thông tin bãi đổ xe");
+            throw new InternalException("Lỗi khi lấy thông tin bãi đỗ xe");
         }
     }
     public ParkingLotDTO getParkingLotById(Long id) {
         ParkingLot parkingLot = parkingLotRepository.findById(id)
             .orElseThrow(() -> {
-                throw new ResourceNotFoundException("ParkingLot not found with id: " + id);
+                throw new ResourceNotFoundException("Không tìm thấy bãi đỗ xe với id: " + id);
             });
         return convertToDTO(parkingLot,null);
     }
@@ -110,7 +104,7 @@ public class ParkingLotService  {
     @Transactional
     public ParkingLotDTO updateParkingLot(ParkingLotDTO parkingLotDTO) {
         ParkingLot parkingLot = parkingLotRepository.findById(parkingLotDTO.getId())
-            .orElseThrow(() -> new ResourceNotFoundException("ParkingLot not found with id: " + parkingLotDTO.getId()));
+            .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy bãi đỗ xe với id: " + parkingLotDTO.getId()));
         
         updateParkingLotFields(parkingLot, parkingLotDTO);
         updateParkingLotImages(parkingLot, parkingLotDTO.getImageFiles());
@@ -158,13 +152,13 @@ public class ParkingLotService  {
             media.setUrl(imageUrl);
             return media;
         } catch (IOException e) {
-            throw new RuntimeException("Failed to store file", e);
+            throw new RuntimeException("Lỗi khi lưu file", e);
         }
     }
 
     public void deleteParkingLot(Long id) {
         if (!parkingLotRepository.existsById(id)) {
-            throw new ResourceNotFoundException("ParkingLot not found with id: " + id);
+            throw new ResourceNotFoundException("Không tìm thấy bãi đỗ xe với id: " + id);
         }
         parkingLotRepository.deleteById(id);
     }

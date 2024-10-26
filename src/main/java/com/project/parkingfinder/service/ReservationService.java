@@ -1,8 +1,12 @@
 package com.project.parkingfinder.service;
 
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -106,4 +110,64 @@ public class ReservationService {
         dto.setTotalPrice(reservation.getPrice());
         return dto;
     }
+
+    public void updateReservation(Long reservationId, ReservationStatus status) {
+        try{
+
+            Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy dữ liệu"));
+            reservation.setStatus(status);
+            reservationRepository.save(reservation);
+        }
+        catch (Exception e) {
+            throw new InternalError("Lỗi khi cập nhật trạng thái đặt chỗ");
+        }
+        
+    }
+
+    public UserReservationsResponse getUserReservations(Long userId, int page, int size) {
+        try{
+
+            PageRequest pageRequest = PageRequest.of(page, size);
+            Page<Reservation> reservationsPage = reservationRepository.findByUserId(userId, pageRequest);
+            List<Reservation> reservations = reservationsPage.getContent();
+            long totalRecords = reservationsPage.getTotalElements();
+            List<ReservationDTO> dtos = new ArrayList<>();
+            for (Reservation reservation : reservations) {
+                VehicleType vehicleType = vehicleTypeRepository.findByTypeAndParkingLotId(reservation.getCarType().toString(), reservation.getParkingSlot().getId())
+                    .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy loại xe cho bãi đỗ xe đã cho"));
+                dtos.add(convertToDTO(reservation, vehicleType));
+            }
+            UserReservationsResponse response = new UserReservationsResponse(dtos, totalRecords);
+            return response;
+        }
+        catch (Exception e) {
+            throw new InternalError("Lỗi khi lấy dữ liệu đặt chỗ của người dùng");
+        }
+        
+    }
+
+
+
+    
+    public class UserReservationsResponse {
+        private List<ReservationDTO> reservations;
+        private long totalRecords;
+
+        // Constructor, getters, and setters
+        public UserReservationsResponse(List<ReservationDTO> reservations, long totalRecords) {
+            this.reservations = reservations;
+            this.totalRecords = totalRecords;
+        }
+
+        public List<ReservationDTO> getReservations() {
+            return reservations;
+        }
+
+        public long getTotalRecords() {
+            return totalRecords;
+        }
+    }
+
 }
+

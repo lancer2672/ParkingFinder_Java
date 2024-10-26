@@ -51,11 +51,13 @@ public interface ParkingLotRepository extends JpaRepository<ParkingLot, Long> {
         ps.totalSlots,
         ps.activeSlots
     )
-    FROM VehicleType vt
-    JOIN ParkingLot pl ON pl.id = vt.parkingLotId
-    JOIN ParkingSlot ps ON ps.vehicleType = vt.type
-    WHERE pl.id = :parkingLotId
-    """)
-List<VehicleDTO> findVehiclesAndSlots(@Param("parkingLotId") Long parkingLotId);
+       FROM VehicleType vt
+       JOIN ParkingLot pl ON pl.id = vt.parkingLotId
+       JOIN ParkingSlot ps ON ps.vehicleType = vt.type
+       WHERE pl.id = :parkingLotId
+       """)
+       List<VehicleDTO> findVehiclesAndSlots(@Param("parkingLotId") Long parkingLotId);
 
+
+       
 }

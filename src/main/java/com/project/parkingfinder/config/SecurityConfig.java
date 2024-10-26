@@ -51,7 +51,7 @@ public class SecurityConfig {
                             if (authException.getCause() instanceof ExpiredJwtException) {
                                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                                 response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-                                response.getWriter().write("{\"error\": \"Token Expired\", \"message\": \"Your session has expired. Please log in again.\"}");
+                                response.getWriter().write("{\"error\": \"Token đã hết hạn\", \"message\": \"Phiên của bạn đã hết hạn. Vui lòng đăng nhập lại.\"}");
                             } else {
                                 new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED).commence(request, response, authException);
                             }
@@ -70,7 +70,7 @@ public class SecurityConfig {
                     throws IOException, jakarta.servlet.ServletException {
                 response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                 response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-                response.getWriter().write("{\"error\": \"Access Denied\", \"message\": \"You don't have permission to access this resource.\"}");
+                response.getWriter().write("{\"error\": \"Từ chối truy cập\", \"message\": \"Bạn không có quyền truy cập vào tài nguyên này.\"}");
             }
         };
     }

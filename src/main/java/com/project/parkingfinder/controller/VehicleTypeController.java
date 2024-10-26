@@ -1,6 +1,5 @@
 package com.project.parkingfinder.controller;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.project.parkingfinder.enums.VehicleTypeEnum;
 import com.project.parkingfinder.model.VehicleType;
 import com.project.parkingfinder.service.VehicleTypeService;
@@ -36,15 +36,15 @@ public class VehicleTypeController {
 
         public static class CreateVehicleTypeRequest {
             @JsonProperty("parkingLotId")
-            @NotNull(message = "Parking lot ID is required")
+            @NotNull(message = "ID bãi đỗ xe là bắt buộc")
             private Long parkingLotId;
             @JsonProperty("type")
-            @NotNull(message = "Vehicle type is required")
+            @NotNull(message = "Loại xe là bắt buộc")
             private VehicleTypeEnum type;
 
-            @NotNull(message = "Price is required")
+            @NotNull(message = "Giá là bắt buộc")
             @JsonProperty("price")
-            @Positive(message = "Price must be positive")
+            @Positive(message = "Giá phải là số dương")
             private Double price;
 
             public VehicleType toVehicleType() {

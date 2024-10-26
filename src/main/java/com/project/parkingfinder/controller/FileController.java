@@ -3,7 +3,6 @@ package com.project.parkingfinder.controller;
 import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -28,9 +27,9 @@ public class FileController {
         try {
             String fileName = fileStorageService.storeFile(file);
 
-            return ResponseEntity.ok("File uploaded successfully: " + fileName);
+            return ResponseEntity.ok("Tệp đã được tải lên thành công: " + fileName);
         } catch (IOException e) {
-            return ResponseEntity.badRequest().body("Failed to upload file: " + e.getMessage());
+            return ResponseEntity.badRequest().body("Không thể tải lên tệp: " + e.getMessage());
         }
     }
 

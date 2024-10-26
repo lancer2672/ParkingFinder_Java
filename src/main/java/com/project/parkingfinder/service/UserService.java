@@ -17,20 +17,18 @@ import com.project.parkingfinder.security.JwtTokenProvider;
 @Service
 public class UserService {
 
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private RoleRepository roleRepository;
-
-    
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
     private final JwtTokenProvider jwtTokenProvider;
+    private final BCryptPasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserService(JwtTokenProvider jwtTokenProvider) {
+    public UserService(UserRepository userRepository, RoleRepository roleRepository, JwtTokenProvider jwtTokenProvider) {
+        this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
         this.jwtTokenProvider = jwtTokenProvider;
+        this.passwordEncoder = new BCryptPasswordEncoder();
     }
-    
-    private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     public User getUser(Long id) {
         return userRepository.findById(id).orElse(null);
@@ -38,8 +36,7 @@ public class UserService {
 
     public List<User> getMerchants(int size, int page, String status) {
         Long merchantRoleId = roleRepository.findByName(RoleEnum.MERCHANT.name())
-                .orElseThrow(() -> new RuntimeException("Merchant role not found"))
-                .getId();
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy vai trò người bán")).getId();
         
         return userRepository.findByRoleIdAndStatus(merchantRoleId, status, 
                 org.springframework.data.domain.PageRequest.of(page,size))
@@ -64,14 +61,14 @@ public class UserService {
 
     public LoginResponse login(String phoneNumber, String password, RoleEnum expectedRole) {
         User user = userRepository.findUserByPhoneNumber(phoneNumber)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid phone number or password"));
+                .orElseThrow(() -> new IllegalArgumentException("Số điện thoại hoặc mật khẩu không đúng"));
 
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new IllegalArgumentException("Invalid phone number or password");
+            throw new IllegalArgumentException("Số điện thoại hoặc mật khẩu không đúng");
         }
 
         if (!user.getRole().getName().equals(expectedRole.name())) {
-            throw new IllegalArgumentException("Unauthorized access");
+            throw new IllegalArgumentException("Không được phép truy cập");
         }
 
         String accessToken = jwtTokenProvider.generateAccessToken(user.getId());

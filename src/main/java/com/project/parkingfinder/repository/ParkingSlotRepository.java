@@ -13,9 +13,9 @@ import com.project.parkingfinder.model.ParkingSlot;
 public interface ParkingSlotRepository extends JpaRepository<ParkingSlot, Long> {
 
     
-List<ParkingSlot> findByParkingLotId(Long parkingLotId);
+    List<ParkingSlot> findByParkingLotId(Long parkingLotId);
 
-List<ParkingSlot> findByParkingLotIdAndVehicleType(Long parkingLotId, VehicleTypeEnum vehicleType);
+    List<ParkingSlot> findByParkingLotIdAndVehicleType(Long parkingLotId, VehicleTypeEnum vehicleType);
 
-Optional<ParkingSlot> findById(Long parkingLotId);
+    Optional<ParkingSlot> findById(Long parkingLotId);
 }
