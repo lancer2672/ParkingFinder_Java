@@ -45,7 +45,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ResponseEntity<ErrorResponse> handleRuntimeException(RuntimeException e, WebRequest request) {
         System.out.println("Last Error: " + e.getMessage()); // In ra lỗi cuối cùng
-        ErrorResponse errorResponse = new ErrorResponse(new Date(), "Internal server error: " + e.getMessage(), request.getDescription(false));
+        ErrorResponse errorResponse = new ErrorResponse(new Date(), e.getMessage(), request.getDescription(false));
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
     }
 
@@ -54,7 +54,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ResponseEntity<ErrorResponse> handleAllExceptions(Exception e, WebRequest request) {
         System.out.println("Last Error: " + e.getMessage()); // In ra lỗi cuối cùng
-        ErrorResponse errorResponse = new ErrorResponse(new Date(), "An unexpected error occurred: " +e.getMessage(), request.getDescription(false));
+        ErrorResponse errorResponse = new ErrorResponse(new Date(), e.getMessage(), request.getDescription(false));
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
     }
 

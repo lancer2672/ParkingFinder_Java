@@ -76,6 +76,10 @@ public class ReservationService {
         if (countReservation > parkingSlot.getActiveSlots()) {
             throw new IllegalArgumentException("Không đủ chỗ đỗ xe trong khoảng thời gian đã chọn");
         }
+        Long freeSlots = parkingSlot.getActiveSlots() - countReservation;
+        if (freeSlots <= 0) {
+            throw new IllegalArgumentException("Không còn chỗ đỗ xe trống trong khoảng thời gian đã chọn");
+        }
         Reservation reservation = new Reservation();
         reservation.setParkingSlot(parkingSlot);
         reservation.setUser(user);

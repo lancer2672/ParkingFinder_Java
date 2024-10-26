@@ -23,8 +23,10 @@ import com.project.parkingfinder.enums.ParkingLotStatus;
 import com.project.parkingfinder.exception.ResourceNotFoundException;
 import com.project.parkingfinder.model.Media;
 import com.project.parkingfinder.model.ParkingLot;
+import com.project.parkingfinder.model.ParkingSlot;
 import com.project.parkingfinder.repository.MediaRepository;
 import com.project.parkingfinder.repository.ParkingLotRepository;
+import com.project.parkingfinder.repository.ParkingSlotRepository;
 import com.project.parkingfinder.repository.ReservationRepository;
 
 @Service
@@ -36,6 +38,8 @@ public class ParkingLotService  {
     private MediaRepository mediaRepository;
     @Autowired
     private ReservationRepository reservationRepository;
+    @Autowired
+    private ParkingSlotRepository parkingSlotRepository;
     @Autowired
     private FileStorageService fileStorageService;
 
@@ -76,11 +80,14 @@ public class ParkingLotService  {
         return convertToDTO(savedParkingLot,0);
     }
 
-    public Long countFreeSlots(Long parkingLotId, LocalDateTime checkIn, LocalDateTime checkOut) {
-        Long count =  reservationRepository.countReservationsInTimeRange(parkingLotId, checkIn, checkOut)
+    public Long countFreeSlots(Long parkingSlotId, LocalDateTime checkIn, LocalDateTime checkOut) {
+        ParkingSlot parkingSlot = parkingSlotRepository.findById(parkingSlotId)
+        .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy chỗ đỗ xe"));
+        Long count =  reservationRepository.countReservationsInTimeRange(parkingSlotId, checkIn, checkOut)
         .orElseThrow(() -> new ResourceNotFoundException("Lỗi khi đếm số lượng chỗ trống"));
-
-        return count;
+        
+        Long freeSlots = parkingSlot.getActiveSlots() - count;
+        return freeSlots < 0 ? 0 : freeSlots;
     }
     public List<VehicleDTO> getVehiclesAndSlots(Long parkingLotId) {
 

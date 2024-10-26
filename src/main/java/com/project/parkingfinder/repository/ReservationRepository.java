@@ -16,7 +16,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
    @Query(value = "SELECT COUNT(*) FROM reservations r WHERE " +
                    "(r.check_in_time BETWEEN :checkIn AND :checkOut OR " +
                    "r.check_out_time BETWEEN :checkIn AND :checkOut) " +
-                   "AND r.parking_slot_id = :parkingSlotId", nativeQuery = true)
+                   "AND r.parking_slot_id = :parkingSlotId AND r.status != 'CANCELLED'", nativeQuery = true)
     Optional<Long> countReservationsInTimeRange(@Param("parkingSlotId") Long parkingSlotId,
                                                 @Param("checkIn") LocalDateTime checkIn,
                                                 @Param("checkOut") LocalDateTime checkOut);
