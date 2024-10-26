@@ -9,7 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.project.parkingfinder.dto.ParkingLotProjection;
-import com.project.parkingfinder.enums.ParkingLotStatus;
+import com.project.parkingfinder.dto.VehicleDTO;
 import com.project.parkingfinder.model.ParkingLot;
 
 @Repository
@@ -42,4 +42,20 @@ public interface ParkingLotRepository extends JpaRepository<ParkingLot, Long> {
            "WHERE pl.owner_id = :ownerId",
            nativeQuery = true)
     List<ParkingLotProjection> findByOwnerIdWithTotalSlots(@Param("ownerId") Long ownerId, Pageable pageable);
+    @Query("""
+    SELECT NEW com.project.parkingfinder.dto.VehicleDTO(
+        vt.parkingLotId,
+        vt.price,
+        vt.type,
+        ps.id,
+        ps.totalSlots,
+        ps.activeSlots
+    )
+    FROM VehicleType vt
+    JOIN ParkingLot pl ON pl.id = vt.parkingLotId
+    JOIN ParkingSlot ps ON ps.vehicleType = vt.type
+    WHERE pl.id = :parkingLotId
+    """)
+List<VehicleDTO> findVehiclesAndSlots(@Param("parkingLotId") Long parkingLotId);
+
 }

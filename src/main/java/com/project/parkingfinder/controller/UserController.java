@@ -165,6 +165,12 @@ public class UserController {
         }
         newUser.setRole(role.get());
 
+        if (RoleEnum.MERCHANT.name().equals(signUpRequest.getRole())) {
+            newUser.setStatus(UserStatus.INACTIVE);
+        } else {
+            newUser.setStatus(UserStatus.ACTIVE);
+        }
+
         return newUser;
     }
 
@@ -182,6 +188,7 @@ public class UserController {
         private Long id;
         private String name;
         private String email;
+        private UserStatus status;
     }
 
     @Data

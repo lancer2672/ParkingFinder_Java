@@ -1,6 +1,7 @@
 package com.project.parkingfinder.service;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -8,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.apache.logging.log4j.util.InternalException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -16,23 +18,24 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.project.parkingfinder.dto.ParkingLotDTO;
 import com.project.parkingfinder.dto.ParkingLotProjection;
+import com.project.parkingfinder.dto.VehicleDTO;
 import com.project.parkingfinder.enums.ParkingLotStatus;
 import com.project.parkingfinder.exception.ResourceNotFoundException;
 import com.project.parkingfinder.model.Media;
 import com.project.parkingfinder.model.ParkingLot;
 import com.project.parkingfinder.repository.MediaRepository;
 import com.project.parkingfinder.repository.ParkingLotRepository;
+import com.project.parkingfinder.repository.ReservationRepository;
 
 @Service
 public class ParkingLotService  {
 
     @Autowired
     private ParkingLotRepository parkingLotRepository;
-
-
     @Autowired
     private MediaRepository mediaRepository;
-
+    @Autowired
+    private ReservationRepository reservationRepository;
     @Autowired
     private FileStorageService fileStorageService;
 
@@ -73,6 +76,22 @@ public class ParkingLotService  {
         return convertToDTO(savedParkingLot,0);
     }
 
+    public Long countFreeSlots(Long parkingLotId, LocalDateTime checkIn, LocalDateTime checkOut) {
+        Long count =  reservationRepository.countReservationsInTimeRange(parkingLotId, checkIn, checkOut)
+        .orElseThrow(() -> new ResourceNotFoundException("Lỗi khi đếm số lượng chỗ trống"));
+
+        return count;
+    }
+    public List<VehicleDTO> getVehiclesAndSlots(Long parkingLotId) {
+
+        try{
+            List<VehicleDTO> vehicles =  parkingLotRepository.findVehiclesAndSlots(parkingLotId);
+            return vehicles;
+        }catch( Exception e){
+            System.out.println(e);
+            throw new InternalException("Lỗi khi lấy thông tin bãi đổ xe");
+        }
+    }
     public ParkingLotDTO getParkingLotById(Long id) {
         ParkingLot parkingLot = parkingLotRepository.findById(id)
             .orElseThrow(() -> {

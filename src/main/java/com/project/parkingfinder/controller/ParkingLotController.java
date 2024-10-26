@@ -1,7 +1,10 @@
 package com.project.parkingfinder.controller;
 
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -18,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.project.parkingfinder.dto.ParkingLotDTO;
 import com.project.parkingfinder.dto.ParkingSlotDTO;
+import com.project.parkingfinder.dto.VehicleDTO;
 import com.project.parkingfinder.enums.ParkingLotStatus;
 import com.project.parkingfinder.service.ParkingLotService;
 import com.project.parkingfinder.service.ParkingSlotService;
@@ -99,6 +103,24 @@ public class ParkingLotController {
             @RequestParam(name = "size", defaultValue = "10") int size) {
         List<ParkingLotDTO> parkingLots = parkingLotService.getParkingLotsByStatus(status, page, size);
         return new ResponseEntity<>(parkingLots, HttpStatus.OK);
+    }
+
+    @GetMapping("/free-slot")
+    public ResponseEntity<Map<String, Long>> countFreeSlot(
+            @RequestParam(name = "checkInTime") LocalDateTime checkIn,
+            @RequestParam(name = "checkOutTime") LocalDateTime checkOut,
+            @RequestParam(name = "parkingSlotId") Long parkingSlotId    
+            ) {
+        Long count = parkingLotService.countFreeSlots(parkingSlotId,checkIn, checkOut);
+        Map<String, Long> response = new HashMap<>();
+        response.put("free_slot", count);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+    @GetMapping("/{parkingLotId}/vehicles")
+    public ResponseEntity<List<VehicleDTO>> getVehiclesByParkingLot(
+        @PathVariable("parkingLotId") Long parkingLotId) {
+        List<VehicleDTO> result = parkingLotService.getVehiclesAndSlots(parkingLotId);
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @GetMapping("/merchant/{merchantId}")

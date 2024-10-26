@@ -9,19 +9,22 @@ import com.project.parkingfinder.model.ParkingSlot;
 import com.project.parkingfinder.model.VehicleType;
 import com.project.parkingfinder.repository.ParkingLotRepository;
 import com.project.parkingfinder.repository.ParkingSlotRepository;
+import com.project.parkingfinder.repository.ReservationRepository;
 import com.project.parkingfinder.repository.VehicleTypeRepository;
 
 @Service
 public class ParkingSlotService {
     private final ParkingSlotRepository parkingSlotRepository;
     private final ParkingLotRepository parkingLotRepository;
+    private final ReservationRepository reservationRepository;  
     private final VehicleTypeRepository vehicleTypeRepository;
 
     @Autowired
-    public ParkingSlotService(ParkingSlotRepository parkingSlotRepository, ParkingLotRepository parkingLotRepository, VehicleTypeRepository vehicleTypeRepository) {
+    public ParkingSlotService(ParkingSlotRepository parkingSlotRepository, ParkingLotRepository parkingLotRepository, VehicleTypeRepository vehicleTypeRepository, ReservationRepository reservationRepository) {
         this.parkingSlotRepository = parkingSlotRepository;
         this.parkingLotRepository = parkingLotRepository;
         this.vehicleTypeRepository = vehicleTypeRepository;
+        this.reservationRepository = reservationRepository;
     }
 
     public ParkingSlotDTO addParkingSlots(Long parkingLotId, Long vehicleTypeId, Integer quantity) {
