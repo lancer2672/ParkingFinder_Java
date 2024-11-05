@@ -19,9 +19,11 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import com.project.parkingfinder.security.APIKeyMiddleware;
 import com.project.parkingfinder.security.JwtAuthenticationFilter;
 
 import io.jsonwebtoken.ExpiredJwtException;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
@@ -31,6 +33,7 @@ import lombok.RequiredArgsConstructor;
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthFilter;
+    private final APIKeyMiddleware apiKeyAuthFilter;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -40,10 +43,11 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Enable CORS
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/health", "/users/signup", "/users/signin", "/users/admin/signin", "/users/merchant/signin", "/api/files/stream/**", "/api/files/upload").permitAll()
-                        
+                        .requestMatchers("/api/reservations/*").authenticated()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(apiKeyAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(exceptions -> exceptions
                         .accessDeniedHandler(accessDeniedHandler())
@@ -64,10 +68,10 @@ public class SecurityConfig {
     public AccessDeniedHandler accessDeniedHandler() {
         return new AccessDeniedHandlerImpl() {
             @Override
-            public void handle(jakarta.servlet.http.HttpServletRequest request,
-                               jakarta.servlet.http.HttpServletResponse response,
+            public void handle(HttpServletRequest request,
+                               HttpServletResponse response,
                                org.springframework.security.access.AccessDeniedException accessDeniedException)
-                    throws IOException, jakarta.servlet.ServletException {
+                    throws IOException {
                 response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                 response.setContentType(MediaType.APPLICATION_JSON_VALUE);
                 response.getWriter().write("{\"error\": \"Từ chối truy cập\", \"message\": \"Bạn không có quyền truy cập vào tài nguyên này.\"}");

@@ -85,7 +85,7 @@ public class UserController {
         if (resp != null) {
             return ResponseEntity.ok(resp);
         } else {
-            return ResponseEntity.badRequest().body("Invalid credentials");
+            return ResponseEntity.badRequest().body("Thông tin đăng nhập không đúng");
         }
     }
     @PostMapping("/merchant/signin")
@@ -94,7 +94,7 @@ public class UserController {
         if (resp != null) {
             return ResponseEntity.ok(resp);
         } else {
-            return ResponseEntity.badRequest().body("Invalid credentials");
+            return ResponseEntity.badRequest().body("Thông tin đăng nhập không đúng");
         }
     }
     @PostMapping("/signin")
@@ -103,7 +103,7 @@ public class UserController {
         if (resp != null) {
             return ResponseEntity.ok(resp);
         } else {
-            return ResponseEntity.badRequest().body("Invalid credentials");
+            return ResponseEntity.badRequest().body("Thông tin đăng nhập không đúng");
         }
     }
 
@@ -112,7 +112,7 @@ public class UserController {
 
         validateSignUpRequest(signUpRequest);
         if (userService.isPhoneNumberExists(signUpRequest.getPhoneNumber())) {
-            return ResponseEntity.badRequest().body("Phone number already registered");
+            return ResponseEntity.badRequest().body("Số điện thoại đã được đăng ký");
         }
 
         User newUser = createUser(signUpRequest);
@@ -148,7 +148,7 @@ public class UserController {
     private void validateSignUpRequest(SignUpRequest signUpRequest) {
         boolean isValidRole = RoleEnum.isValidRole(signUpRequest.getRole());
         if (!isValidRole) {
-            throw new IllegalArgumentException("Invalid role: " + signUpRequest.getRole());
+            throw new IllegalArgumentException("Vai trò không hợp lệ: " + signUpRequest.getRole());
         }
     }
 
@@ -161,7 +161,7 @@ public class UserController {
 
         Optional<Role> role = roleService.getRoleByName(signUpRequest.getRole().toUpperCase());
         if (role.isEmpty()) {
-            throw new RuntimeException("Role not found: " + signUpRequest.getRole());
+            throw new RuntimeException("Vai trò không tìm thấy: " + signUpRequest.getRole());
         }
         newUser.setRole(role.get());
 
@@ -193,39 +193,39 @@ public class UserController {
 
     @Data
     public static class LoginRequest {
-        @NotBlank(message = "Phone number is required")
+        @NotBlank(message = "Số điện thoại là bắt buộc")
         private String phoneNumber;
 
-        @NotBlank(message = "Password is required")
+        @NotBlank(message = "Mật khẩu là bắt buộc")
         private String password;
     }
 
     @Data
     public static class SignUpRequest {
-        @NotBlank(message = "Phone number is required")
+        @NotBlank(message = "Số điện thoại là bắt buộc")
         private String phoneNumber;
 
-        @NotBlank(message = "Password is required")
-        @Size(min = 6, message = "Password must be at least 6 characters")
+        @NotBlank(message = "Mật khẩu là bắt buộc")
+        @Size(min = 6, message = "Mật khẩu phải ít nhất 6 ký tự")
         private String password;
 
-        @NotBlank(message = "Email is required")
-        @Email(message = "Email should be valid")
+        @NotBlank(message = "Email là bắt buộc")
+        @Email(message = "Email phải hợp lệ")
         private String email;
 
-        @NotBlank(message = "Name is required")
+        @NotBlank(message = "Tên là bắt buộc")
         private String name;
 
-        @NotBlank(message = "Role is required")
+        @NotBlank(message = "Vai trò là bắt buộc")
         private String role;
     }
 
     @Data
     public static class UpdateUserRequest {
-        @Size(min = 6, message = "Password must be at least 6 characters")
+        @Size(min = 6, message = "Mật khẩu phải ít nhất 6 ký tự")
         private String password;
 
-        @Email(message = "Email should be valid")
+        @Email(message = "Email phải hợp lệ")
         private String email;
 
         private String name;

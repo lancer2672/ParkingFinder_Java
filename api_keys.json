@@ -1,0 +1,10 @@
+[
+    {
+        "userId":"your_user_id",
+        "apiKey":"DEFAULT"
+    },
+    {
+        "userId":"your_user_id",
+        "apiKey":"MERCHANT_01"
+    }
+]
