@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.project.parkingfinder.dto.LoginResponse;
+import com.project.parkingfinder.dto.UserDTO;
 import com.project.parkingfinder.enums.RoleEnum;
 import com.project.parkingfinder.enums.UserStatus;
 import com.project.parkingfinder.model.Role;
@@ -52,11 +53,11 @@ public class UserController {
     }
 
     @GetMapping("/merchants")
-    public ResponseEntity<List<User>> getMerchants(
+    public ResponseEntity<List<UserDTO>> getMerchants(
             @RequestParam(name = "size", defaultValue = "10") int size,
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "status", required = false) String status) {
-        List<User> merchants = userService.getMerchants(size, page, status);
+        List<UserDTO> merchants = userService.getMerchants(size, page, status);
         return ResponseEntity.ok(merchants);
     }
 

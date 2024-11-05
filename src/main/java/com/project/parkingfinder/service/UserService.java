@@ -1,17 +1,22 @@
 package com.project.parkingfinder.service;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.project.parkingfinder.dto.LoginResponse;
+import com.project.parkingfinder.dto.UserDTO;
 import com.project.parkingfinder.enums.RoleEnum;
 import com.project.parkingfinder.model.User;
 import com.project.parkingfinder.repository.RoleRepository;
 import com.project.parkingfinder.repository.UserRepository;
+import com.project.parkingfinder.security.ApiKey;
+import com.project.parkingfinder.security.ApiKeyLoader;
 import com.project.parkingfinder.security.JwtTokenProvider;
 
 @Service
@@ -34,15 +39,39 @@ public class UserService {
         return userRepository.findById(id).orElse(null);
     }
 
-    public List<User> getMerchants(int size, int page, String status) {
+    public List<UserDTO> getMerchants(int size, int page, String status) {
         Long merchantRoleId = roleRepository.findByName(RoleEnum.MERCHANT.name())
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy vai trò người bán")).getId();
         
-        return userRepository.findByRoleIdAndStatus(merchantRoleId, status, 
+        List<User> users = userRepository.findByRoleIdAndStatus(merchantRoleId, status, 
                 org.springframework.data.domain.PageRequest.of(page,size))
                 .getContent();
+        
+        List<UserDTO> userDTOs = users.stream()
+                .map(user -> {
+                    UserDTO userDTO = new UserDTO();
+                    userDTO.setId(user.getId());
+                    userDTO.setName(user.getName());
+                    userDTO.setPhoneNumber(user.getPhoneNumber());
+                    userDTO.setEmail(user.getEmail());
+                    userDTO.setStatus(user.getStatus());
+                    // Map to API keys to check if there's a corresponding userId -> get apiKey to attach to userDTO, otherwise assign an empty string
+                    try {
+                        String apiKey = ApiKeyLoader.loadApiKeys("api_keys.json").stream()
+                                .filter(key -> key.getUserId().equals(user.getId().toString()))
+                                .findFirst()
+                                .map(ApiKey::getApiKey)
+                                .orElse("");
+                        userDTO.setApiKey(apiKey);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        userDTO.setApiKey("");
+                    }
+                    return userDTO;
+                })
+                .collect(Collectors.toList());
+        return userDTOs;
     }
-    
     public List<User> getAllUsers(){
         return userRepository.findAll();
     }
