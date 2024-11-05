@@ -1,5 +1,7 @@
 package com.project.parkingfinder.model;
 
+import java.util.Date;
+
 import com.project.parkingfinder.enums.PaymentMethod;
 import com.project.parkingfinder.enums.PaymentStatus;
 
@@ -11,6 +13,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -37,6 +41,10 @@ public class Payment {
     @Enumerated(EnumType.STRING)
     @Column(name = "payment_status", nullable = false)
     private PaymentStatus paymentStatus;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "payment_date", nullable = false)
+    private Date paymentDate;
 
     public Payment() {}
 
