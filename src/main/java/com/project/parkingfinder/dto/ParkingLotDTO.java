@@ -83,7 +83,7 @@ public class ParkingLotDTO {
         this.districtId = districtId;
         this.wardId = wardId;
         // Fetch names for province, district, and ward
-        fetchLocationNames();
+//        fetchLocationNames();
     }
 
     public void fetchLocationNames() {

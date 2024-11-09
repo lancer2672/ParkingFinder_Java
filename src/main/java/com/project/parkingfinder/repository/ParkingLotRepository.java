@@ -2,6 +2,7 @@ package com.project.parkingfinder.repository;
 
 import java.util.List;
 
+import com.project.parkingfinder.enums.VehicleTypeEnum;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -14,18 +15,26 @@ import com.project.parkingfinder.model.ParkingLot;
 
 @Repository
 public interface ParkingLotRepository extends JpaRepository<ParkingLot, Long> {
-       @Query(value = "SELECT pl.*, " +
-              "COALESCE((SELECT SUM(ps.active_slots) FROM parking_slots ps WHERE ps.parking_lot_id = pl.id AND ps.vehicle_type = :type ), 0) AS total_parking_slots, " +
-              "m.url AS image_url " +
-              "FROM parking_lots pl " +
-              "LEFT JOIN medias m ON m.table_id = pl.id AND m.table_type = 'PARKING_LOT' AND m.media_type = 'IMAGE' " +
-              "WHERE (6371 * acos(cos(radians(:latitude)) * cos(radians(pl.latitude)) * cos(radians(pl.longitude) - radians(:longitude)) + sin(radians(:latitude)) * sin(radians(pl.latitude)))) <= :radius " +
-              "AND pl.status = 'ACTIVE'",
-              nativeQuery = true)
-       List<ParkingLotProjection> findParkingLotsInRegionWithTotalSlots(@Param("latitude") Double latitude,
-                                                                        @Param("longitude") Double longitude,
-                                                                        @Param("radius") Double radius,
-                                                                        @Param("type") String type);
+    @Query(value = "SELECT pl.*, " +
+            "COALESCE(SUM(ps.active_slots), 0) AS total_parking_slots, " +
+            "m.url AS image_url " +
+            "FROM parking_lots pl " +
+            "LEFT JOIN parking_slots ps ON ps.parking_lot_id = pl.id AND ps.vehicle_type = :type " +
+            "LEFT JOIN medias m ON m.table_id = pl.id AND m.table_type = 'PARKING_LOT' AND m.media_type = 'IMAGE' " +
+            "WHERE pl.status = 'ACTIVE' " +
+            "AND (6371 * acos( " +
+            "cos(radians(:latitude)) * cos(radians(pl.latitude)) * " +
+            "cos(radians(pl.longitude) - radians(:longitude)) + " +
+            "sin(radians(:latitude)) * sin(radians(pl.latitude)) " +
+            ")) <= :radius " +
+            "GROUP BY pl.id, m.url " +
+            "HAVING COALESCE(SUM(ps.active_slots), 0) > 0",
+            nativeQuery = true)
+    List<ParkingLotProjection> findParkingLotsInRegionWithTotalSlots(@Param("latitude") Double latitude,
+                                                                     @Param("longitude") Double longitude,
+                                                                     @Param("radius") Double radius,
+                                                                     @Param("type") String type);
+
     @Query(value = "SELECT pl.*, " +
            "COALESCE((SELECT SUM(ps.active_slots) FROM parking_slots ps WHERE ps.parking_lot_id = pl.id), 0) AS total_parking_slots, " +
            "m.url AS image_url " +

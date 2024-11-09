@@ -257,7 +257,7 @@ public class ParkingLotService  {
         dto.setWardId(parkingLot.getWardId());
         dto.setOpenHour(parkingLot.getOpenHour());
         dto.setCloseHour(parkingLot.getCloseHour());
-        dto.fetchLocationNames();
+//        dto.fetchLocationNames();
         return dto;
     }
      private ParkingLotDTO createDTO(ParkingLotProjection projection) {
@@ -276,7 +276,7 @@ public class ParkingLotService  {
         dto.setStatus(projection.getStatus());
         dto.setCapacity(projection.getTotalParkingSlots().intValue());
         dto.setImages(new ArrayList<>());
-        dto.fetchLocationNames();
+//        dto.fetchLocationNames();
         return dto;
     }
 
