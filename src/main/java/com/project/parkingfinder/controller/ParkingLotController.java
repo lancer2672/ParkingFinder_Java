@@ -23,6 +23,7 @@ import com.project.parkingfinder.dto.ParkingLotDTO;
 import com.project.parkingfinder.dto.ParkingSlotDTO;
 import com.project.parkingfinder.dto.VehicleDTO;
 import com.project.parkingfinder.enums.ParkingLotStatus;
+import com.project.parkingfinder.enums.VehicleTypeEnum;
 import com.project.parkingfinder.service.ParkingLotService;
 import com.project.parkingfinder.service.ParkingSlotService;
 
@@ -71,8 +72,9 @@ public class ParkingLotController {
     public ResponseEntity<List<ParkingLotDTO>> getActiveParkingLotsInRegion(
             @RequestParam(name = "lat") Double latitude,
             @RequestParam(name = "lng") Double longitude,
+            @RequestParam(name = "type") VehicleTypeEnum type,
             @RequestParam(name = "radius_km") Double radius) {
-        List<ParkingLotDTO> parkingLots = parkingLotService.getParkingLotsInRegion(latitude, longitude, radius);
+        List<ParkingLotDTO> parkingLots = parkingLotService.getParkingLotsInRegion(latitude, longitude, radius,type);
         return new ResponseEntity<>(parkingLots, HttpStatus.OK);
     }
 
@@ -109,9 +111,11 @@ public class ParkingLotController {
     public ResponseEntity<Map<String, Long>> countFreeSlot(
             @RequestParam(name = "checkInTime") LocalDateTime checkIn,
             @RequestParam(name = "checkOutTime") LocalDateTime checkOut,
-            @RequestParam(name = "parkingSlotId") Long parkingSlotId    
+            @RequestParam(name = "parkingLotId") Long parkinglotId,
+            @RequestParam(name = "type") VehicleTypeEnum type    
+
             ) {
-        Long count = parkingLotService.countFreeSlots(parkingSlotId,checkIn, checkOut);
+        Long count = parkingLotService.countFreeSlots(parkinglotId,type,checkIn, checkOut);
         Map<String, Long> response = new HashMap<>();
         response.put("free_slot", count);
         return new ResponseEntity<>(response, HttpStatus.OK);

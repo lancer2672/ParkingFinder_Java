@@ -20,6 +20,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
                    "r.check_out_time BETWEEN :checkIn AND :checkOut) " +
                    "AND r.parking_slot_id = :parkingSlotId AND r.status != 'CANCELLED'", nativeQuery = true)
     Optional<Long> countReservationsInTimeRange(@Param("parkingSlotId") Long parkingSlotId,
+                
                                                 @Param("checkIn") LocalDateTime checkIn,
                                                 @Param("checkOut") LocalDateTime checkOut);
 

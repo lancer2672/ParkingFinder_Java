@@ -15,7 +15,7 @@ import com.project.parkingfinder.model.ParkingLot;
 @Repository
 public interface ParkingLotRepository extends JpaRepository<ParkingLot, Long> {
        @Query(value = "SELECT pl.*, " +
-              "COALESCE((SELECT SUM(ps.active_slots) FROM parking_slots ps WHERE ps.parking_lot_id = pl.id), 0) AS total_parking_slots, " +
+              "COALESCE((SELECT SUM(ps.active_slots) FROM parking_slots ps WHERE ps.parking_lot_id = pl.id AND ps.vehicle_type = :type ), 0) AS total_parking_slots, " +
               "m.url AS image_url " +
               "FROM parking_lots pl " +
               "LEFT JOIN medias m ON m.table_id = pl.id AND m.table_type = 'PARKING_LOT' AND m.media_type = 'IMAGE' " +
@@ -24,7 +24,8 @@ public interface ParkingLotRepository extends JpaRepository<ParkingLot, Long> {
               nativeQuery = true)
        List<ParkingLotProjection> findParkingLotsInRegionWithTotalSlots(@Param("latitude") Double latitude,
                                                                         @Param("longitude") Double longitude,
-                                                                        @Param("radius") Double radius);
+                                                                        @Param("radius") Double radius,
+                                                                        @Param("type") String type);
     @Query(value = "SELECT pl.*, " +
            "COALESCE((SELECT SUM(ps.active_slots) FROM parking_slots ps WHERE ps.parking_lot_id = pl.id), 0) AS total_parking_slots, " +
            "m.url AS image_url " +

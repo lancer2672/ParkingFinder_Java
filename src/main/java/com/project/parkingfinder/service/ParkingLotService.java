@@ -20,6 +20,7 @@ import com.project.parkingfinder.dto.ParkingLotDTO;
 import com.project.parkingfinder.dto.ParkingLotProjection;
 import com.project.parkingfinder.dto.VehicleDTO;
 import com.project.parkingfinder.enums.ParkingLotStatus;
+import com.project.parkingfinder.enums.VehicleTypeEnum;
 import com.project.parkingfinder.exception.ResourceNotFoundException;
 import com.project.parkingfinder.model.Media;
 import com.project.parkingfinder.model.ParkingLot;
@@ -74,10 +75,10 @@ public class ParkingLotService  {
         return convertToDTO(savedParkingLot,0);
     }
 
-    public Long countFreeSlots(Long parkingSlotId, LocalDateTime checkIn, LocalDateTime checkOut) {
-        ParkingSlot parkingSlot = parkingSlotRepository.findById(parkingSlotId)
+    public Long countFreeSlots(Long parkingLotId, VehicleTypeEnum type, LocalDateTime checkIn, LocalDateTime checkOut) {
+        ParkingSlot parkingSlot = parkingSlotRepository.findByParkingLotIdAndVehicleType(parkingLotId,type)
         .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy chỗ đỗ xe"));
-        Long count =  reservationRepository.countReservationsInTimeRange(parkingSlotId, checkIn, checkOut)
+        Long count =  reservationRepository.countReservationsInTimeRange(parkingSlot.getId(), checkIn, checkOut)
         .orElseThrow(() -> new ResourceNotFoundException("Lỗi khi đếm số lượng chỗ trống"));
         
         Long freeSlots = parkingSlot.getActiveSlots() - count;
@@ -164,9 +165,9 @@ public class ParkingLotService  {
     }
 
 
-    public List<ParkingLotDTO> getParkingLotsInRegion(Double latitude, Double longitude, Double radius) {
-        List<ParkingLotProjection> parkingLotsData = parkingLotRepository.findParkingLotsInRegionWithTotalSlots(latitude, longitude, radius);
-        
+    public List<ParkingLotDTO> getParkingLotsInRegion(Double latitude, Double longitude, Double radius, VehicleTypeEnum type) {
+        System.out.println("Fetching parking lots in region with latitude: " + latitude + ", longitude: " + longitude + ", radius: " + radius + ", and vehicle type: " + type);
+        List<ParkingLotProjection> parkingLotsData = parkingLotRepository.findParkingLotsInRegionWithTotalSlots(latitude, longitude, radius, type.toString());
         Map<Long, ParkingLotDTO> dtoMap = new HashMap<>();
  
         for (ParkingLotProjection projection : parkingLotsData) {
