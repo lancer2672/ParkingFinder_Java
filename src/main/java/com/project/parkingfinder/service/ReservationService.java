@@ -73,15 +73,14 @@ public class ReservationService {
             .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy bãi đỗ xe"));
 
         LocalTime startTime = reservationDTO.getStartTime().toLocalTime(); // Assuming this returns LocalDateTime
-        LocalTime endTime = reservationDTO.getEndTime().toLocalTime(); // Assuming this returns LocalDateTime
 
         if (parkingLot.getOpenHour().isAfter(startTime)) {
                 throw new IllegalArgumentException("Bãi đỗ chưa mở cửa vào thời gian này"); 
         }
         
-        if (parkingLot.getCloseHour().isBefore(endTime)) {
-            throw new IllegalArgumentException("Bãi đỗ đã đóng cửa vào thời gian này");
-        }
+//        if (parkingLot.getCloseHour().isBefore(endTime)) {
+//            throw new IllegalArgumentException("Bãi đỗ đã đóng cửa vào thời gian này");
+//        }
 
         if (parkingLot.getStatus().equals(ParkingLotStatus.INACTIVE)) {
             throw new IllegalArgumentException("Bãi đỗ xe đã ngưng hoạt động");
@@ -94,7 +93,7 @@ public class ReservationService {
                 
         VehicleType vehicleType = vehicleTypeRepository.findByTypeAndParkingLotId(reservationDTO.getVehicleType(), parkingSlot.getParkingLotId())
             .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy loại xe cho bãi đỗ xe đã cho"));
-        Long countReservation = reservationRepository.countReservationsInTimeRange(parkingSlot.getId(), reservationDTO.getStartTime(), reservationDTO.getEndTime())
+        Long countReservation = reservationRepository.countCheckedInReservations(parkingSlot.getId(), reservationDTO.getStartTime())
             .orElseThrow(() -> new EntityNotFoundException("Lỗi khi đếm số lượng đặt chỗ"));
             
         if (countReservation > parkingSlot.getActiveSlots()) {
@@ -111,8 +110,6 @@ public class ReservationService {
         reservation.setCarType(vehicleType.getType());
         reservation.setPrice(vehicleType.getPrice());
         reservation.setCheckInTime(reservationDTO.getStartTime());
-        reservation.setCheckOutTime(reservationDTO.getEndTime());
-
         Reservation savedReservation = reservationRepository.save(reservation);
         try {
         this.scheduleTicketCancellation(savedReservation.getId());
@@ -129,7 +126,7 @@ public class ReservationService {
         dto.setParkingLotId(reservation.getParkingSlot().getId());
         dto.setStatus(reservation.getStatus());
         dto.setStartTime(reservation.getCheckInTime());
-        dto.setEndTime(reservation.getCheckOutTime());
+
         dto.setVehicleType(vehicleType.getType().toString());
         dto.setTotalPrice(reservation.getPrice());
         return dto;

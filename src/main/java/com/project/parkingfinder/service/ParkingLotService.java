@@ -75,10 +75,10 @@ public class ParkingLotService  {
         return convertToDTO(savedParkingLot,0);
     }
 
-    public Long countFreeSlots(Long parkingLotId, VehicleTypeEnum type, LocalDateTime checkIn, LocalDateTime checkOut) {
+    public Long countFreeSlots(Long parkingLotId, VehicleTypeEnum type, LocalDateTime checkIn) {
         ParkingSlot parkingSlot = parkingSlotRepository.findByParkingLotIdAndVehicleType(parkingLotId,type)
         .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy chỗ đỗ xe"));
-        Long count =  reservationRepository.countReservationsInTimeRange(parkingSlot.getId(), checkIn, checkOut)
+        Long count =  reservationRepository.countCheckedInReservations(parkingSlot.getId(), checkIn)
         .orElseThrow(() -> new ResourceNotFoundException("Lỗi khi đếm số lượng chỗ trống"));
         
         Long freeSlots = parkingSlot.getActiveSlots() - count;

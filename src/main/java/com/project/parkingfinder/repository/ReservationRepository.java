@@ -15,14 +15,13 @@ import com.project.parkingfinder.model.Reservation;
 @Repository
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
 
-   @Query(value = "SELECT COUNT(*) FROM reservations r WHERE " +
-                   "(r.check_in_time BETWEEN :checkIn AND :checkOut OR " +
-                   "r.check_out_time BETWEEN :checkIn AND :checkOut) " +
-                   "AND r.parking_slot_id = :parkingSlotId AND r.status != 'CANCELLED'", nativeQuery = true)
-    Optional<Long> countReservationsInTimeRange(@Param("parkingSlotId") Long parkingSlotId,
-                
-                                                @Param("checkIn") LocalDateTime checkIn,
-                                                @Param("checkOut") LocalDateTime checkOut);
+    @Query(value = "SELECT COUNT(*) FROM reservations r " +
+            "WHERE r.check_in_time <= :currentTime " +
+            "AND r.parking_slot_id = :parkingSlotId " +
+            "AND r.status = 'CHECKED_IN'", nativeQuery = true)
+    Optional<Long> countCheckedInReservations(@Param("parkingSlotId") Long parkingSlotId,
+                                              @Param("currentTime") LocalDateTime currentTime);
+
 
     @Query("SELECT r FROM Reservation r WHERE r.user.id = :userId ORDER BY r.checkInTime DESC")
     Page<Reservation> findByUserId(@Param("userId") Long userId, Pageable pageable);

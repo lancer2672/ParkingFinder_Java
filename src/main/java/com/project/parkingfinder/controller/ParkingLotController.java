@@ -110,12 +110,11 @@ public class ParkingLotController {
     @GetMapping("/free-slot")
     public ResponseEntity<Map<String, Long>> countFreeSlot(
             @RequestParam(name = "checkInTime") LocalDateTime checkIn,
-            @RequestParam(name = "checkOutTime") LocalDateTime checkOut,
             @RequestParam(name = "parkingLotId") Long parkinglotId,
             @RequestParam(name = "type") VehicleTypeEnum type    
 
             ) {
-        Long count = parkingLotService.countFreeSlots(parkinglotId,type,checkIn, checkOut);
+        Long count = parkingLotService.countFreeSlots(parkinglotId,type,checkIn);
         Map<String, Long> response = new HashMap<>();
         response.put("free_slot", count);
         return new ResponseEntity<>(response, HttpStatus.OK);

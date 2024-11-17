@@ -8,6 +8,8 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
+
 @Component
 public class CancelTicketJob implements Job {
 
@@ -26,6 +28,7 @@ public class CancelTicketJob implements Job {
 
         if (ticket != null && ticket.getStatus().equals(ReservationStatus.PENDING)) {
             ticket.setStatus(ReservationStatus.CANCELLED);
+            ticket.setCheckOutTime(LocalDateTime.now());
             System.out.println("ReservationStatus" );
             reservationRepository.save(ticket);
             System.out.println("Cancelled ticket ID: " + reservationId);

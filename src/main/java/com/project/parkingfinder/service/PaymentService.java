@@ -4,6 +4,7 @@ package com.project.parkingfinder.service;
 import java.util.Date;
 import java.util.Map;
 
+import com.project.parkingfinder.repository.ReservationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -60,12 +61,12 @@ public class PaymentService {
     }
 
     public Payment createPayment(PaymentDTO paymentDTO) {
-  
+
             Payment existsPayment = paymentRepository.findByReservationIdAndPaymentStatus(paymentDTO.getReservationId(), PaymentStatus.COMPLETED).orElse(null);
             if (existsPayment != null) {
                 throw new IllegalArgumentException("This reservation is already paid");
             }
-            
+
             Payment payment = convertPaymentDTOToPayment(paymentDTO, PaymentStatus.COMPLETED);
             paymentRepository.save(payment);
             return payment;

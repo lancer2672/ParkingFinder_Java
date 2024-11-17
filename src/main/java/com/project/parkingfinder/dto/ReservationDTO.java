@@ -20,9 +20,6 @@ public class ReservationDTO {
 
     @NotNull(message = "Thời gian bắt đầu là bắt buộc")
     private LocalDateTime startTime;
-    
-    @NotNull(message = "Thời gian kết thúc là bắt buộc")
-    private LocalDateTime endTime;
 
     @NotNull(message = "Loại xe là bắt buộc")
     private String vehicleType;
