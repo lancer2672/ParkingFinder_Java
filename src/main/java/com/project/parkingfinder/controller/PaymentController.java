@@ -3,6 +3,7 @@ package com.project.parkingfinder.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,6 +13,7 @@ import com.project.parkingfinder.dto.PaymentDTO;
 import com.project.parkingfinder.model.Payment;
 import com.project.parkingfinder.service.PaymentService;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 @RestController
@@ -29,5 +31,15 @@ public class PaymentController {
     public ResponseEntity<Payment> createPayment(@Valid @RequestBody PaymentDTO paymentDTO) {
         Payment createdPayment = paymentService.createPayment(paymentDTO);
         return new ResponseEntity<>(createdPayment, HttpStatus.CREATED);
+    }
+    @GetMapping("/vn-pay")
+    public ResponseEntity<PaymentDTO.VNPayResponse> pay(HttpServletRequest request) {
+        return new ResponseEntity<>(paymentService.createVnPayPayment(request), HttpStatus.OK );
+    }
+    @GetMapping("/vn-pay-callback")
+    public ResponseEntity<PaymentDTO.VNPayResponse> payCallbackHandler(HttpServletRequest request) {
+        String status = request.getParameter("vnp_ResponseCode");
+        PaymentDTO.VNPayResponse res = new PaymentDTO.VNPayResponse(status,status.equals("00") ? "Success" : "Failed","");
+        return new ResponseEntity<>(res, status.equals("00") ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
     }
 }

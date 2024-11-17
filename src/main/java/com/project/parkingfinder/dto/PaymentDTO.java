@@ -5,6 +5,7 @@ import com.project.parkingfinder.enums.PaymentStatus;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -27,4 +28,21 @@ public class PaymentDTO {
 
     @JsonProperty("payment_status")
     private PaymentStatus paymentStatus;
+    
+
+    @Getter
+    @Setter
+    @Builder
+    public static class VNPayResponse {
+        private String code;
+        private String message;
+        private String paymentUrl;
+
+        public VNPayResponse(String code, String message, String paymentUrl) {
+            this.code = code;
+            this.message = message;
+            this.paymentUrl = paymentUrl;
+        }
+    }
+
 }
