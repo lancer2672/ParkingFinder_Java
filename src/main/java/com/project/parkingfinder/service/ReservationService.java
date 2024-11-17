@@ -1,9 +1,14 @@
 package com.project.parkingfinder.service;
 
+import java.time.Instant;
 import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
+import jakarta.annotation.PreDestroy;
+import org.quartz.impl.StdSchedulerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -23,8 +28,9 @@ import com.project.parkingfinder.repository.ParkingSlotRepository;
 import com.project.parkingfinder.repository.ReservationRepository;
 import com.project.parkingfinder.repository.UserRepository;
 import com.project.parkingfinder.repository.VehicleTypeRepository;
-
+import org.quartz.*;
 import jakarta.persistence.EntityNotFoundException;
+
 @Service
 public class ReservationService {
 
@@ -43,8 +49,22 @@ public class ReservationService {
     @Autowired
     private ParkingLotRepository parkingLotRepository;
 
+    private final Scheduler scheduler;
+
+    @Autowired
+    public ReservationService(Scheduler scheduler) {
+        this.scheduler = scheduler;
+    }
+
+    @PreDestroy
+    public void destroy() throws SchedulerException {
+        if (scheduler != null && !scheduler.isShutdown()) {
+            scheduler.shutdown();
+        }
+    }
     @Transactional
     public ReservationDTO createReservation(ReservationDTO reservationDTO) {
+
         //TODO check overlap, check open close, check status, ... khách vãng lai
         User user = userRepository.findById(reservationDTO.getUserId())
         .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy người dùng"));
@@ -94,7 +114,11 @@ public class ReservationService {
         reservation.setCheckOutTime(reservationDTO.getEndTime());
 
         Reservation savedReservation = reservationRepository.save(reservation);
-
+        try {
+        this.scheduleTicketCancellation(savedReservation.getId());
+        }catch (Exception e) {
+            throw new InternalError("Failed to create reservation: " + e.getMessage(), e);
+        }
         return convertToDTO(savedReservation, vehicleType);
     }
 
@@ -149,10 +173,25 @@ public class ReservationService {
 
 
 
-    
-    public class UserReservationsResponse {
-        private List<ReservationDTO> reservations;
-        private long totalRecords;
+    public void scheduleTicketCancellation(Long ticketId) throws SchedulerException {
+        JobDetail job = JobBuilder.newJob(CancelTicketJob.class)
+                .withIdentity("cancelTicketJob-" + ticketId)
+                .usingJobData("ticketId", ticketId)
+                .build();
+
+        Trigger trigger = TriggerBuilder.newTrigger()
+                .withIdentity("cancelTicketTrigger-" + ticketId)
+                .startAt(Date.from(Instant.now().plus(30, ChronoUnit.SECONDS)))
+                .build();
+        System.out.println("Trigger created for ticket ID: " + ticketId);
+        scheduler.scheduleJob(job, trigger);
+    }
+
+
+
+    public static class UserReservationsResponse {
+        private final List<ReservationDTO> reservations;
+        private final long totalRecords;
 
         // Constructor, getters, and setters
         public UserReservationsResponse(List<ReservationDTO> reservations, long totalRecords) {
