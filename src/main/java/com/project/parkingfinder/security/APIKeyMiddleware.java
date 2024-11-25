@@ -10,7 +10,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-@Component
+//@Component
 public class APIKeyMiddleware extends OncePerRequestFilter {
 
     private static final String API_KEY_HEADER = "X-API-KEY"; // Name of the header for the API key

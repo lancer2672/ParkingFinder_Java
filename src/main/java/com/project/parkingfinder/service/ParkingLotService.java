@@ -80,7 +80,8 @@ public class ParkingLotService  {
         .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy chỗ đỗ xe"));
         Long count =  reservationRepository.countCheckedInReservations(parkingSlot.getId(), checkIn)
         .orElseThrow(() -> new ResourceNotFoundException("Lỗi khi đếm số lượng chỗ trống"));
-        
+
+        System.out.println(count);
         Long freeSlots = parkingSlot.getActiveSlots() - count;
         return freeSlots < 0 ? 0 : freeSlots;
     }
