@@ -101,6 +101,13 @@ public class ParkingLotService  {
             });
         return convertToDTO(parkingLot,null);
     }
+    public ParkingLot getById(Long id) {
+        ParkingLot parkingLot = parkingLotRepository.findById(id)
+            .orElseThrow(() -> {
+                throw new ResourceNotFoundException("Không tìm thấy bãi đỗ xe với id: " + id);
+            });
+        return parkingLot;
+    }
 
     @Transactional
     public ParkingLotDTO updateParkingLot(ParkingLotDTO parkingLotDTO) {
