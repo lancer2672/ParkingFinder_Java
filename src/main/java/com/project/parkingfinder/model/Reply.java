@@ -2,6 +2,8 @@ package com.project.parkingfinder.model;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -37,5 +39,10 @@ public class Reply {
     private String comment;
     private LocalDateTime created_at;
     private LocalDateTime updated_at;
+
+    @JsonIgnore
+    public Review getReview() {
+        return review;
+    }
 
 }

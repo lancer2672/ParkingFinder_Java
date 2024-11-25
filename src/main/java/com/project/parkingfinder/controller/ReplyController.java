@@ -60,9 +60,9 @@ public class ReplyController {
         reply.setUser(user);
         reply.setReview(review);
         reply.setComment(request.getComment());
-        reply.setCreated(LocalDateTime.now());
-        reply.setUpdated(LocalDateTime.now());
-
+        reply.setCreated_at(LocalDateTime.now());
+        reply.setUpdated_at(LocalDateTime.now());
+        
         Reply newReply = replyService.save(reply);
         return new ResponseEntity<>(newReply, HttpStatus.CREATED);
     }
