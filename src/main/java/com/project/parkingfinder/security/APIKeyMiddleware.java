@@ -1,7 +1,6 @@
 package com.project.parkingfinder.security;
 
 import java.io.IOException;
-import java.util.List;
 
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -19,20 +18,20 @@ public class APIKeyMiddleware extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException  {
-        String requestUri = request.getRequestURI();
-        System.out.println("Request URI: " + requestUri);
-        if (!requestUri.startsWith("/api/reservations")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
+        // String requestUri = request.getRequestURI();
+        // System.out.println("Request URI: " + requestUri);
+        // if (!requestUri.startsWith("/api/reservations")) {
+        //     filterChain.doFilter(request, response);
+        //     return;
+        // }
 
-        List<ApiKey> apiKeys = ApiKeyLoader.loadApiKeys("api_keys.json");
-        String apiKey = request.getHeader(API_KEY_HEADER);
-        boolean isValidApiKey = apiKey != null && apiKeys.stream().anyMatch(key -> key.getApiKey().equals(apiKey));
-        System.out.println(">>> Received API Key: " + apiKey + ", Validation Result: " + isValidApiKey);
-        if (!isValidApiKey) {
-            throw new ServletException("Invalid API Key");
-        }
+        // List<ApiKey> apiKeys = ApiKeyLoader.loadApiKeys("api_keys.json");
+        // String apiKey = request.getHeader(API_KEY_HEADER);
+        // boolean isValidApiKey = apiKey != null && apiKeys.stream().anyMatch(key -> key.getApiKey().equals(apiKey));
+        // System.out.println(">>> Received API Key: " + apiKey + ", Validation Result: " + isValidApiKey);
+        // if (!isValidApiKey) {
+        //     throw new ServletException("Invalid API Key");
+        // }
 
         // Continue the filter chain
         filterChain.doFilter(request, response);
