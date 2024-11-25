@@ -2,6 +2,8 @@ package com.project.parkingfinder.model;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -43,4 +45,10 @@ public class Review {
     @JoinColumn(name = "image_id", nullable = true)
     private Media image;
 
+
+    
+    @JsonIgnore
+    public ParkingLot getParkingLot() {
+        return parkingLot;
+    }
 }

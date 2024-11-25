@@ -89,6 +89,15 @@ public class UserController {
             return ResponseEntity.badRequest().body("Thông tin đăng nhập không đúng");
         }
     }
+    @PostMapping("/staff/signin")
+    public ResponseEntity<?> loginStaff(@Valid @RequestBody LoginRequest loginRequest) {
+        LoginResponse resp = userService.loginStaff(loginRequest.getPhoneNumber(), loginRequest.getPassword());
+        if (resp != null) {
+            return ResponseEntity.ok(resp);
+        } else {
+            return ResponseEntity.badRequest().body("Thông tin đăng nhập không đúng");
+        }
+    }
     @PostMapping("/merchant/signin")
     public ResponseEntity<?> loginMerchant(@Valid @RequestBody LoginRequest loginRequest) {
         LoginResponse resp  = userService.loginMerchant(loginRequest.getPhoneNumber(), loginRequest.getPassword());

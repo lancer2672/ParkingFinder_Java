@@ -109,6 +109,9 @@ public class UserService {
     public LoginResponse loginMerchant(String phoneNumber , String password) {
         return login(phoneNumber, password, RoleEnum.MERCHANT);
     }
+    public LoginResponse loginStaff(String phoneNumber , String password) {
+        return login(phoneNumber, password, RoleEnum.STAFF);
+    }
 
 
     public LoginResponse loginAdmin(String phoneNumber, String password) {

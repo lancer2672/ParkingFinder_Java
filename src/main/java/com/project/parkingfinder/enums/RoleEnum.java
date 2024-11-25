@@ -3,7 +3,8 @@ package com.project.parkingfinder.enums;
 public enum RoleEnum {
     USER,
     MERCHANT,
-    ADMIN;
+    ADMIN,
+    STAFF;
     public static boolean isValidRole(String role) {
         if (role == null) {
             return false;
