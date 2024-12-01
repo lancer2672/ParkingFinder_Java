@@ -36,7 +36,7 @@ public class PaymentController {
     public ResponseEntity<Payment> createPayment(@Valid @RequestBody PaymentDTO paymentDTO) {
         Payment createdPayment = paymentService.createPayment(paymentDTO);
         if(paymentDTO.getUserId() != null){
-            socketService.emitPaymentMessage(createdPayment.getPaymentStatus().toString(),paymentDTO.getUserId().toString());
+            socketService.emitPaymentMessage(paymentDTO.getUserId().toString(),createdPayment.getPaymentStatus().toString());
         }
         return new ResponseEntity<>(createdPayment, HttpStatus.CREATED);
     }
