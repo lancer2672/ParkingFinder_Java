@@ -1,5 +1,6 @@
 package com.project.parkingfinder.controller;
 
+import com.project.parkingfinder.service.SocketService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,13 +24,20 @@ public class PaymentController {
     @Autowired
     private final PaymentService paymentService;
 
-    public PaymentController(PaymentService paymentService) {
+    @Autowired
+    private final SocketService socketService;
+
+    public PaymentController(PaymentService paymentService, SocketService socketService) {
         this.paymentService = paymentService;
+        this.socketService = socketService;
     }
 
     @PostMapping
     public ResponseEntity<Payment> createPayment(@Valid @RequestBody PaymentDTO paymentDTO) {
         Payment createdPayment = paymentService.createPayment(paymentDTO);
+        if(paymentDTO.getUserId() != null){
+            socketService.emitPaymentMessage(createdPayment.getPaymentStatus().toString(),paymentDTO.getUserId().toString());
+        }
         return new ResponseEntity<>(createdPayment, HttpStatus.CREATED);
     }
     @GetMapping("/vn-pay")

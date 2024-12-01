@@ -68,6 +68,7 @@ public class PaymentService {
             }
 
             Payment payment = convertPaymentDTOToPayment(paymentDTO, PaymentStatus.COMPLETED);
+
             paymentRepository.save(payment);
             return payment;
        

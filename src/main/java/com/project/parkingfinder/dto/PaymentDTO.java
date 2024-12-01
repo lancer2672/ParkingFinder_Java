@@ -17,6 +17,7 @@ public class PaymentDTO {
     @JsonProperty("reservation_id")
     private Long reservationId;
 
+    private Long userId;
     @NotNull(message = "Amount cannot be null")
     @Positive(message = "Amount must be positive")
     @JsonProperty("amount")
