@@ -62,7 +62,8 @@ public class ReplyController {
         reply.setComment(request.getComment());
         reply.setCreated_at(LocalDateTime.now());
         reply.setUpdated_at(LocalDateTime.now());
-        
+        reply.setImageUrls(request.getImageUrls());
+
         Reply newReply = replyService.save(reply);
         return new ResponseEntity<>(newReply, HttpStatus.CREATED);
     }

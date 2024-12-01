@@ -4,8 +4,11 @@ import java.time.LocalDateTime;
 
 import com.project.parkingfinder.enums.ReservationStatus;
 
+import com.project.parkingfinder.model.Payment;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 public class ReservationDTO {
@@ -27,4 +30,8 @@ public class ReservationDTO {
     private Double totalPrice;
 
     private ReservationStatus status;
+
+    private  Payment payment;
+
+
 }

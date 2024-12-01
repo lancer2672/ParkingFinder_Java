@@ -6,7 +6,10 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
+import com.project.parkingfinder.model.*;
+import com.project.parkingfinder.repository.*;
 import jakarta.annotation.PreDestroy;
 import org.quartz.impl.StdSchedulerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,16 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.project.parkingfinder.dto.ReservationDTO;
 import com.project.parkingfinder.enums.ParkingLotStatus;
 import com.project.parkingfinder.enums.ReservationStatus;
-import com.project.parkingfinder.model.ParkingLot;
-import com.project.parkingfinder.model.ParkingSlot;
-import com.project.parkingfinder.model.Reservation;
-import com.project.parkingfinder.model.User;
-import com.project.parkingfinder.model.VehicleType;
-import com.project.parkingfinder.repository.ParkingLotRepository;
-import com.project.parkingfinder.repository.ParkingSlotRepository;
-import com.project.parkingfinder.repository.ReservationRepository;
-import com.project.parkingfinder.repository.UserRepository;
-import com.project.parkingfinder.repository.VehicleTypeRepository;
 import org.quartz.*;
 import jakarta.persistence.EntityNotFoundException;
 
@@ -50,6 +43,8 @@ public class ReservationService {
     private ParkingLotRepository parkingLotRepository;
 
     private final Scheduler scheduler;
+    @Autowired
+    private PaymentRepository paymentRepository;
 
     @Autowired
     public ReservationService(Scheduler scheduler) {
@@ -147,25 +142,41 @@ public class ReservationService {
     }
 
     public UserReservationsResponse getUserReservations(Long userId, int page, int size) {
-        try{
-
-            PageRequest pageRequest = PageRequest.of(page, size);
+        try {
+            // Tạo PageRequest để phân trang
+            PageRequest pageRequest = PageRequest.of(page, 1000);
             Page<Reservation> reservationsPage = reservationRepository.findByUserId(userId, pageRequest);
+
+            // Lấy danh sách đặt chỗ và tổng số bản ghi
             List<Reservation> reservations = reservationsPage.getContent();
             long totalRecords = reservationsPage.getTotalElements();
+
+            // Tạo danh sách DTO
             List<ReservationDTO> dtos = new ArrayList<>();
             for (Reservation reservation : reservations) {
-                VehicleType vehicleType = vehicleTypeRepository.findByTypeAndParkingLotId(reservation.getCarType().toString(), reservation.getParkingSlot().getId())
-                    .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy loại xe cho bãi đỗ xe đã cho"));
-                dtos.add(convertToDTO(reservation, vehicleType));
+                // Tìm VehicleType
+                VehicleType vehicleType = vehicleTypeRepository
+                        .findByTypeAndParkingLotId(reservation.getCarType().toString(), reservation.getParkingSlot().getId())
+                        .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy loại xe cho bãi đỗ xe đã cho"));
+
+                // Tìm Payment (nếu có)
+                Optional<Payment> paymentOpt = paymentRepository.findPaymentByReservationId(reservation.getId());
+
+                // Chuyển đổi Reservation sang DTO
+                ReservationDTO dto = convertToDTO(reservation, vehicleType);
+
+                // Nếu Payment tồn tại, gán vào DTO
+                paymentOpt.ifPresent(dto::setPayment);
+
+                // Thêm DTO vào danh sách
+                dtos.add(dto);
             }
-            UserReservationsResponse response = new UserReservationsResponse(dtos, totalRecords);
-            return response;
-        }
-        catch (Exception e) {
+
+            // Tạo và trả về response
+            return new UserReservationsResponse(dtos, totalRecords);
+        } catch (Exception e) {
             throw new InternalError("Lỗi khi lấy dữ liệu đặt chỗ của người dùng");
         }
-        
     }
 
 

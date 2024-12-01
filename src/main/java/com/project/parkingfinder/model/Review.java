@@ -46,6 +46,8 @@ public class Review {
     private Media image;
 
 
+    private String imagesUrls;
+
     
     @JsonIgnore
     public ParkingLot getParkingLot() {

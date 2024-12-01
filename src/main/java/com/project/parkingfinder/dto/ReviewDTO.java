@@ -27,6 +27,6 @@ public class ReviewDTO {
         @NotBlank(message = "Comment cannot be blank")
         private String comment;
 
-        private Long imageId; // Optional, so no validation annotations
+        private String imageId; // Optional, so no validation annotations
     }
 }

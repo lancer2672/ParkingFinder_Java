@@ -12,4 +12,5 @@ import com.project.parkingfinder.model.Payment;
 public interface PaymentRepository extends JpaRepository<Payment, Long>{
     Optional<Payment> findByReservationIdAndPaymentStatus(Long reservationId, PaymentStatus status);
 
+    Optional<Payment> findPaymentByReservationId(Long reservationId);
 }

@@ -63,6 +63,7 @@ public ResponseEntity<Review> createReview(@RequestBody @Valid ReviewDTO.CreateR
     review.setComment(request.getComment());
     review.setCreated(LocalDateTime.now());
     review.setUpdated(LocalDateTime.now());
+    review.setImagesUrls(request.getImageId());
 
     Review newReview = reviewService.save(review);
     return new ResponseEntity<>(newReview, HttpStatus.CREATED);

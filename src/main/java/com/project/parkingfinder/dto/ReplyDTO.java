@@ -19,5 +19,7 @@ public class ReplyDTO {
 
         @NotBlank(message = "Comment cannot be blank")
         private String comment;
+
+        private String imageUrls;
     }
 }

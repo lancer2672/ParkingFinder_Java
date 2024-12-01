@@ -35,8 +35,9 @@ public class Reply {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
-
     private String comment;
+    private String imageUrls;
+
     private LocalDateTime created_at;
     private LocalDateTime updated_at;
 
