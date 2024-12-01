@@ -24,5 +24,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
            countQuery = "SELECT count(*) FROM users WHERE role_id = :roleId AND status = :status",
            nativeQuery = true)
     Page<User> findByRoleIdAndStatus(@Param("roleId") Long roleId, @Param("status") String status, Pageable pageable);
+ 
+    @Query(value = "SELECT * FROM users WHERE role_id = :roleId AND merchant_id = :merchantId",
+           countQuery = "SELECT count(*) FROM users WHERE role_id = :roleId AND merchant_id = :merchantId",
+           nativeQuery = true)
+    Page<User> findStaffByMerchant(@Param("merchantId") Long merchantId,@Param("roleId") Long roleId,  Pageable pageable);
 
 }

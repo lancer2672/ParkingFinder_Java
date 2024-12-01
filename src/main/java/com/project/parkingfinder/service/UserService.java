@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -46,7 +47,7 @@ public class UserService {
         List<User> users = userRepository.findByRoleIdAndStatus(merchantRoleId, status, 
                 org.springframework.data.domain.PageRequest.of(page,size))
                 .getContent();
-        
+            
         List<UserDTO> userDTOs = users.stream()
                 .map(user -> {
                     UserDTO userDTO = new UserDTO();
@@ -71,6 +72,22 @@ public class UserService {
                 })
                 .collect(Collectors.toList());
         return userDTOs;
+    }
+   
+
+    public  Page<User>  getStaffs(int size, int page, String status) {
+        Long staffId = roleRepository.findByName(RoleEnum.STAFF.name())
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy vai trò")).getId();
+        
+        return userRepository.findByRoleIdAndStatus(staffId, status, 
+                org.springframework.data.domain.PageRequest.of(page,size));
+    }
+    public  Page<User>  getStaffsByMerchant(long merchantId,int size, int page) {
+        Long staffId = roleRepository.findByName(RoleEnum.STAFF.name())
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy vai trò")).getId();
+
+        return userRepository.findStaffByMerchant(merchantId,staffId,
+                org.springframework.data.domain.PageRequest.of(page,size));
     }
     public List<User> getAllUsers(){
         return userRepository.findAll();

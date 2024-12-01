@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.project.parkingfinder.dto.LoginResponse;
+import com.project.parkingfinder.dto.ResponseTemplate;
 import com.project.parkingfinder.dto.UserDTO;
 import com.project.parkingfinder.enums.RoleEnum;
 import com.project.parkingfinder.enums.UserStatus;
@@ -59,6 +61,22 @@ public class UserController {
             @RequestParam(name = "status", required = false) String status) {
         List<UserDTO> merchants = userService.getMerchants(size, page, status);
         return ResponseEntity.ok(merchants);
+    }
+    @GetMapping("/staffs")
+    public ResponseTemplate<User> getStaffs(
+            @RequestParam(name = "size", defaultValue = "10") int size,
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "status", required = false) String status) {
+        Page<User> userPage = userService.getStaffs(size, page, status);
+        return ResponseTemplate.success(userPage);
+    }
+    @GetMapping("/merchants/{id}/staff")
+    public ResponseTemplate<User> getStaffsByMerchant(
+            @PathVariable("id") Long merchantId,
+            @RequestParam(name = "size", defaultValue = "10") int size,
+            @RequestParam(name = "page", defaultValue = "0") int page) {
+        Page<User> userPage = userService.getStaffsByMerchant(merchantId, size, page);
+        return ResponseTemplate.success(userPage);
     }
 
     @GetMapping
@@ -168,7 +186,10 @@ public class UserController {
         newUser.setPassword(signUpRequest.getPassword()); // Remember to hash the password
         newUser.setName(signUpRequest.getName());
         newUser.setEmail(signUpRequest.getEmail());
-
+        if(signUpRequest.merchantId != null){
+            User merchant = userService.getUser(signUpRequest.merchantId);
+            newUser.setMerchant(merchant);
+        }
         Optional<Role> role = roleService.getRoleByName(signUpRequest.getRole().toUpperCase());
         if (role.isEmpty()) {
             throw new RuntimeException("Vai trò không tìm thấy: " + signUpRequest.getRole());
@@ -228,6 +249,8 @@ public class UserController {
 
         @NotBlank(message = "Vai trò là bắt buộc")
         private String role;
+
+        private Long merchantId;
     }
 
     @Data
