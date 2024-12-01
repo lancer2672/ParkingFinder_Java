@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Bean;
 public class SocketConfig {
 
 //    @Value("${socket.host:localhost}")
-    private String host = "192.168.187.104";
+    private String host = "localhost";
 
     @Value("${socket.port:9092}")
     private Integer port;
