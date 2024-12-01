@@ -2,6 +2,7 @@ package com.project.parkingfinder.controller;
 
 import java.io.IOException;
 
+import com.project.parkingfinder.service.MinioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -21,6 +22,16 @@ public class FileController {
 
     @Autowired
     private FileStorageService fileStorageService;
+    private final MinioService minioService;
+
+    public FileController(MinioService minioService) {
+        this.minioService = minioService;
+    }
+
+    @PostMapping("/mupload")
+    public String mUploadFile(@RequestParam("file") MultipartFile file) {
+        return minioService.uploadFile(file, "/");
+    }
 
     @PostMapping("/upload")
     public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) {
@@ -32,6 +43,7 @@ public class FileController {
             return ResponseEntity.badRequest().body("Không thể tải lên tệp: " + e.getMessage());
         }
     }
+
 
     @GetMapping("/stream/{fileName:.+}")
     public ResponseEntity<Resource> streamFile(@PathVariable("fileName") String fileName) {
