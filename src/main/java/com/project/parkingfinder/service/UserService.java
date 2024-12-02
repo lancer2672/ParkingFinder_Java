@@ -102,10 +102,10 @@ public class UserService {
     }
 
     public LoginResponse loginUser(String phoneNumber, String password) {
-        return login(phoneNumber, password, RoleEnum.USER);
+        return login(phoneNumber, password);
     }
 
-    public LoginResponse login(String phoneNumber, String password, RoleEnum expectedRole) {
+    public LoginResponse login(String phoneNumber, String password) {
         User user = userRepository.findUserByPhoneNumber(phoneNumber)
                 .orElseThrow(() -> new IllegalArgumentException("Số điện thoại hoặc mật khẩu không đúng"));
 
@@ -113,26 +113,22 @@ public class UserService {
             throw new IllegalArgumentException("Số điện thoại hoặc mật khẩu không đúng");
         }
 
-        if (!user.getRole().getName().equals(expectedRole.name())) {
-            throw new IllegalArgumentException("Không được phép truy cập");
-        }
-
         String accessToken = jwtTokenProvider.generateAccessToken(user.getId());
         String refreshToken = jwtTokenProvider.generateRefreshToken(user.getId());
             
-        return new LoginResponse(user.getId(), accessToken, refreshToken);
+        return new LoginResponse(user.getId(), user.getRole().getName(),accessToken, refreshToken);
     }
 
     public LoginResponse loginMerchant(String phoneNumber , String password) {
-        return login(phoneNumber, password, RoleEnum.MERCHANT);
+        return login(phoneNumber, password);
     }
     public LoginResponse loginStaff(String phoneNumber , String password) {
-        return login(phoneNumber, password, RoleEnum.STAFF);
+        return login(phoneNumber, password);
     }
 
 
     public LoginResponse loginAdmin(String phoneNumber, String password) {
-        return login(phoneNumber, password, RoleEnum.ADMIN);
+        return login(phoneNumber, password);
     }
     public boolean isPhoneNumberExists(String phoneNumber) {
         Optional<User> optionalUser = userRepository.findUserByPhoneNumber(phoneNumber);
