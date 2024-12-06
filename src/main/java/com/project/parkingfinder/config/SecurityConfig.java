@@ -77,22 +77,12 @@ public class SecurityConfig {
             }
         };
     }
-
-    // CORS configuration source bean
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-
-        // Allow all origins
-        configuration.addAllowedOriginPattern("*");
-
-        // Allow all HTTP methods
+        configuration.setAllowedOrigins(List.of("http://localhost:3000", "*"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-
-        // Allow all headers
-        configuration.addAllowedHeader("*");
-
-        // Allow credentials
+        configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

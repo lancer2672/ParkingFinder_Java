@@ -17,6 +17,7 @@ import jakarta.validation.Valid;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/api/reservations")
 public class ReservationController {
