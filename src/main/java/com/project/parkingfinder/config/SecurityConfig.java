@@ -61,7 +61,7 @@ public class SecurityConfig {
                         })
                 )
                 .build();
-    } 
+    }
 
     @Bean
     public AccessDeniedHandler accessDeniedHandler() {
@@ -82,9 +82,17 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("*")); 
+
+        // Allow all origins
+        configuration.addAllowedOriginPattern("*");
+
+        // Allow all HTTP methods
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+
+        // Allow all headers
+        configuration.addAllowedHeader("*");
+
+        // Allow credentials
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

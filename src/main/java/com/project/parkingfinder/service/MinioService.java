@@ -67,13 +67,8 @@ public class MinioService {
         }
     }
     public String getFileUrl(String endpoint, String bucketName, String uniqueFileName) {
-        // Ensure there are no duplicate slashes in the URL
-        if (!endpoint.endsWith("/")) {
-            endpoint += "/";
-        }
 
-        // Build and return the complete URL
-        return endpoint + bucketName + "/" + uniqueFileName;
+        return endpoint +"/"+ bucketName + "/" + uniqueFileName;
     }
 
     /**

@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -109,7 +110,7 @@ public class ParkingLotController {
 
     @GetMapping("/free-slot")
     public ResponseEntity<Map<String, Long>> countFreeSlot(
-            @RequestParam(name = "checkInTime") LocalDateTime checkIn,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime checkIn,
             @RequestParam(name = "parkingLotId") Long parkinglotId,
             @RequestParam(name = "type") VehicleTypeEnum type    
 

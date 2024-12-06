@@ -165,8 +165,10 @@ public class ReservationService {
                 // Chuyển đổi Reservation sang DTO
                 ReservationDTO dto = convertToDTO(reservation, vehicleType);
 
+                Optional<ParkingLot> pkl = parkingLotRepository.findById(reservation.getParkingSlot().getParkingLotId());
                 // Nếu Payment tồn tại, gán vào DTO
                 paymentOpt.ifPresent(dto::setPayment);
+                pkl.ifPresent(dto::setParkingLot);
 
                 // Thêm DTO vào danh sách
                 dtos.add(dto);
@@ -189,7 +191,7 @@ public class ReservationService {
 
         Trigger trigger = TriggerBuilder.newTrigger()
                 .withIdentity("cancelTicketTrigger-" + ticketId)
-                .startAt(Date.from(Instant.now().plus(30, ChronoUnit.SECONDS)))
+                .startAt(Date.from(Instant.now().plus(90, ChronoUnit.SECONDS)))
                 .build();
         System.out.println("Trigger created for ticket ID: " + ticketId);
         scheduler.scheduleJob(job, trigger);

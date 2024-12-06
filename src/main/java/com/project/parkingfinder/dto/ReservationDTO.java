@@ -4,11 +4,13 @@ import java.time.LocalDateTime;
 
 import com.project.parkingfinder.enums.ReservationStatus;
 
+import com.project.parkingfinder.model.ParkingLot;
 import com.project.parkingfinder.model.Payment;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 
 @Data
 public class ReservationDTO {
@@ -22,6 +24,7 @@ public class ReservationDTO {
     private Long parkingLotId;
 
     @NotNull(message = "Thời gian bắt đầu là bắt buộc")
+//    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime startTime;
 
     @NotNull(message = "Loại xe là bắt buộc")
@@ -32,6 +35,6 @@ public class ReservationDTO {
     private ReservationStatus status;
 
     private  Payment payment;
-
+    private ParkingLot parkingLot;
 
 }

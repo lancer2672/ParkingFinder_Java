@@ -29,7 +29,7 @@ public class User {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "role_id")
-    @JsonIgnore
+//    @JsonIgnore
     private Role role;
 
     @Enumerated(EnumType.STRING)
