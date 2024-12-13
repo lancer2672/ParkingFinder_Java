@@ -27,7 +27,6 @@ import jakarta.validation.constraints.Positive;
 import lombok.Getter;
 import lombok.Setter;
 
-@CrossOrigin
 @RestController
 @RequestMapping("/api/parking-lots")
 public class ParkingLotController {

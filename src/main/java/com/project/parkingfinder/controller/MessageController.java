@@ -29,7 +29,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 @RestController
-@CrossOrigin
 @RequiredArgsConstructor
 public class MessageController {
     private final SocketService socketIOHandler;

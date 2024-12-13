@@ -41,7 +41,7 @@ public class CancelTicketJob implements Job {
 
             ticket.setStatus(ReservationStatus.CANCELLED);
             ticket.setCheckOutTime(LocalDateTime.parse(formattedTime));
-            System.out.println("ReservationStatus" );
+            System.out.println("ReservationStatus formattedTime: "  + formattedTime);
             reservationRepository.save(ticket);
             System.out.println("Cancelled ticket ID: " + reservationId);
             socketService.emitCancelMessage(ticket.getUser().getId().toString(), reservationId.toString());

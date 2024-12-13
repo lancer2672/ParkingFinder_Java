@@ -17,7 +17,6 @@ import org.springframework.web.context.request.WebRequest;
 import lombok.Getter;
 
 
-@CrossOrigin
 @ControllerAdvice
 public class GlobalExceptionHandler {
 

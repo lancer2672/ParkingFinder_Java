@@ -27,7 +27,6 @@ import lombok.Data;
 
 @RestController
 @RequestMapping("/users")
-@CrossOrigin
 @Validated
 public class UserController {
 

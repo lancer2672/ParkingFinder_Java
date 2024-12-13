@@ -14,7 +14,6 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
-@CrossOrigin
 @RestController
 @RequestMapping("/api/vehicle-types")
 public class VehicleTypeController {

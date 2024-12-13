@@ -14,7 +14,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 @RestController
-@CrossOrigin
 @RequestMapping("/api/payments")
 public class PaymentController {
 
@@ -33,7 +32,7 @@ public class PaymentController {
     public ResponseEntity<Payment> createPayment(@Valid @RequestBody PaymentDTO paymentDTO) {
         Payment createdPayment = paymentService.createPayment(paymentDTO);
         if(paymentDTO.getUserId() != null){
-            socketService.emitPaymentMessage(paymentDTO.getUserId().toString(),createdPayment.getPaymentStatus().toString());
+            socketService.emitPaymentMessage(paymentDTO.getUserId().toString(),createdPayment.getPaymentStatus().toString(), createdPayment.getAmount(), paymentDTO.getReservationId().toString());
         }
         return new ResponseEntity<>(createdPayment, HttpStatus.CREATED);
     }

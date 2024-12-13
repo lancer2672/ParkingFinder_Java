@@ -19,7 +19,6 @@ import com.project.parkingfinder.service.UserService;
 import jakarta.validation.Valid;
 
 @RestController
-@CrossOrigin
 @RequestMapping("/api/replies")
 public class ReplyController {
 

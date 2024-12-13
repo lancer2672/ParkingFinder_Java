@@ -16,9 +16,9 @@ import com.project.parkingfinder.model.Reservation;
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
 
     @Query(value = "SELECT COUNT(*) FROM reservations r " +
-            "WHERE r.check_in_time <= :currentTime " +
+            "WHERE r.start_time <= :currentTime " +
             "AND r.parking_slot_id = :parkingSlotId " +
-            "AND r.status = 'CHECKED_IN'", nativeQuery = true)
+            "AND r.status = 'CHECKED_IN' OR r.status = 'PENDING'", nativeQuery = true)
     Optional<Long> countCheckedInReservations(@Param("parkingSlotId") Long parkingSlotId,
                                               @Param("currentTime") LocalDateTime currentTime);
 

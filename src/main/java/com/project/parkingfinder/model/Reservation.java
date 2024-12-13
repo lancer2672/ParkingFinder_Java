@@ -44,6 +44,7 @@ public class Reservation {
     private ReservationStatus status;
 
     private LocalDateTime checkInTime;
+    private LocalDateTime startTime;
     private LocalDateTime checkOutTime;
 
     @Enumerated(EnumType.STRING)

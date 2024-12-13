@@ -2,6 +2,7 @@ package com.project.parkingfinder.dto;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.project.parkingfinder.enums.ReservationStatus;
 
 import com.project.parkingfinder.model.ParkingLot;
@@ -26,6 +27,8 @@ public class ReservationDTO {
     @NotNull(message = "Thời gian bắt đầu là bắt buộc")
 //    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime startTime;
+    private LocalDateTime checkInTime;
+    private LocalDateTime checkOutTime;
 
     @NotNull(message = "Loại xe là bắt buộc")
     private String vehicleType;
@@ -33,7 +36,8 @@ public class ReservationDTO {
     private Double totalPrice;
 
     private ReservationStatus status;
-
+    @JsonIgnore
+    private Integer cancelMinute;
     private  Payment payment;
     private ParkingLot parkingLot;
 

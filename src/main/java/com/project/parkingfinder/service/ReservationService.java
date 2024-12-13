@@ -1,7 +1,9 @@
 package com.project.parkingfinder.service;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Date;
@@ -46,9 +48,12 @@ public class ReservationService {
     @Autowired
     private PaymentRepository paymentRepository;
 
+    private final SocketService socketService;
+
     @Autowired
-    public ReservationService(Scheduler scheduler) {
+    public ReservationService(Scheduler scheduler, SocketService socketService) {
         this.scheduler = scheduler;
+        this.socketService = socketService;
     }
 
     @PreDestroy
@@ -57,22 +62,25 @@ public class ReservationService {
             scheduler.shutdown();
         }
     }
+    public Reservation getReservationById(Long resId){
+        return reservationRepository.findById(resId).orElseThrow(() -> new EntityNotFoundException("Không tìm thấy "));
+    }
     @Transactional
     public ReservationDTO createReservation(ReservationDTO reservationDTO) {
 
         //TODO check overlap, check open close, check status, ... khách vãng lai
         User user = userRepository.findById(reservationDTO.getUserId())
         .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy người dùng"));
-    
+
         ParkingLot parkingLot = parkingLotRepository.findById(reservationDTO.getParkingLotId())
             .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy bãi đỗ xe"));
 
         LocalTime startTime = reservationDTO.getStartTime().toLocalTime(); // Assuming this returns LocalDateTime
 
-        if (parkingLot.getOpenHour().isAfter(startTime)) {
-                throw new IllegalArgumentException("Bãi đỗ chưa mở cửa vào thời gian này"); 
-        }
-        
+//        if (parkingLot.getOpenHour().isAfter(startTime)) {
+//                throw new IllegalArgumentException("Bãi đỗ chưa mở cửa vào thời gian này");
+//        }
+
 //        if (parkingLot.getCloseHour().isBefore(endTime)) {
 //            throw new IllegalArgumentException("Bãi đỗ đã đóng cửa vào thời gian này");
 //        }
@@ -85,12 +93,12 @@ public class ReservationService {
         }
         ParkingSlot parkingSlot = parkingSlotRepository.findById(reservationDTO.getParkingLotId())
             .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy chỗ đỗ xe"));
-                
+
         VehicleType vehicleType = vehicleTypeRepository.findByTypeAndParkingLotId(reservationDTO.getVehicleType(), parkingSlot.getParkingLotId())
             .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy loại xe cho bãi đỗ xe đã cho"));
         Long countReservation = reservationRepository.countCheckedInReservations(parkingSlot.getId(), reservationDTO.getStartTime())
             .orElseThrow(() -> new EntityNotFoundException("Lỗi khi đếm số lượng đặt chỗ"));
-            
+
         if (countReservation > parkingSlot.getActiveSlots()) {
             throw new IllegalArgumentException("Không đủ chỗ đỗ xe trong khoảng thời gian đã chọn");
         }
@@ -104,10 +112,10 @@ public class ReservationService {
         reservation.setStatus(ReservationStatus.PENDING);
         reservation.setCarType(vehicleType.getType());
         reservation.setPrice(vehicleType.getPrice());
-        reservation.setCheckInTime(reservationDTO.getStartTime());
+        reservation.setStartTime(reservationDTO.getStartTime());
         Reservation savedReservation = reservationRepository.save(reservation);
         try {
-        this.scheduleTicketCancellation(savedReservation.getId());
+        this.scheduleTicketCancellation(savedReservation.getId(), reservationDTO.getCancelMinute());
         }catch (Exception e) {
             throw new InternalError("Failed to create reservation: " + e.getMessage(), e);
         }
@@ -120,8 +128,9 @@ public class ReservationService {
         dto.setUserId(reservation.getUser().getId());
         dto.setParkingLotId(reservation.getParkingSlot().getId());
         dto.setStatus(reservation.getStatus());
-        dto.setStartTime(reservation.getCheckInTime());
-
+        dto.setStartTime(reservation.getStartTime());
+        dto.setCheckInTime(reservation.getCheckInTime());
+        dto.setCheckOutTime(reservation.getCheckOutTime());
         dto.setVehicleType(vehicleType.getType().toString());
         dto.setTotalPrice(reservation.getPrice());
         return dto;
@@ -129,16 +138,30 @@ public class ReservationService {
 
     public void updateReservation(Long reservationId, ReservationStatus status) {
         try{
+            LocalDateTime now = LocalDateTime.now();
 
             Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy dữ liệu"));
             reservation.setStatus(status);
+
+            if (status == ReservationStatus.CHECKED_IN){
+                DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+                String formattedTime = now.format(formatter);
+                reservation.setCheckInTime(LocalDateTime.parse(formattedTime));
+            }
+            if(status == ReservationStatus.CHECKED_OUT){
+                DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+                String formattedTime = now.format(formatter);
+                reservation.setCheckOutTime(LocalDateTime.parse(formattedTime));
+            }
+            socketService.emitUpdateStatusMsg(reservation.getUser().getId().toString(),reservationId.toString(),status.toString());
+
             reservationRepository.save(reservation);
         }
         catch (Exception e) {
             throw new InternalError("Lỗi khi cập nhật trạng thái đặt chỗ");
         }
-        
+
     }
 
     public UserReservationsResponse getUserReservations(Long userId, int page, int size) {
@@ -183,7 +206,11 @@ public class ReservationService {
 
 
 
-    public void scheduleTicketCancellation(Long ticketId) throws SchedulerException {
+    public void scheduleTicketCancellation(Long ticketId, Integer cancelMinute) throws SchedulerException {
+
+        if(cancelMinute == null || cancelMinute == 0 ){
+                return;
+        }
         JobDetail job = JobBuilder.newJob(CancelTicketJob.class)
                 .withIdentity("cancelTicketJob-" + ticketId)
                 .usingJobData("ticketId", ticketId)
@@ -191,7 +218,7 @@ public class ReservationService {
 
         Trigger trigger = TriggerBuilder.newTrigger()
                 .withIdentity("cancelTicketTrigger-" + ticketId)
-                .startAt(Date.from(Instant.now().plus(90, ChronoUnit.SECONDS)))
+                .startAt(Date.from(Instant.now().plus(cancelMinute, ChronoUnit.MINUTES)))
                 .build();
         System.out.println("Trigger created for ticket ID: " + ticketId);
         scheduler.scheduleJob(job, trigger);

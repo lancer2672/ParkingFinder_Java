@@ -18,7 +18,6 @@ import com.project.parkingfinder.service.UserService;
 
 import jakarta.validation.Valid;
 
-@CrossOrigin
 @RestController
 @RequestMapping("/api/reviews")
 public class ReviewController {

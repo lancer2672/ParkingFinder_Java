@@ -1,5 +1,7 @@
 package com.project.parkingfinder.controller;
 
+import com.project.parkingfinder.dto.ResponseTemplate;
+import com.project.parkingfinder.model.Reservation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.http.HttpStatus;
@@ -17,7 +19,6 @@ import jakarta.validation.Valid;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 
-@CrossOrigin
 @RestController
 @RequestMapping("/api/reservations")
 public class ReservationController {
@@ -47,5 +48,10 @@ public class ReservationController {
         UserReservationsResponse userReservations = reservationService.getUserReservations(userId, page, size);
         return new ResponseEntity<>(userReservations, HttpStatus.OK);
     }
-    
+    @GetMapping("/{id}")
+    public ResponseEntity<Reservation> getReservationById(@PathVariable("id") Long resId) {
+        Reservation data = reservationService.getReservationById(resId);
+        return new ResponseEntity<>(data,HttpStatus.OK);
+    }
+
 }

@@ -41,7 +41,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Enable CORS
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/health", "/users/signup", "/users/signin", "/users/admin/signin", "/users/merchant/signin", "/users/staff/signin", "/api/files/stream/**", "/api/files/upload").permitAll()
+                        .requestMatchers("/health", "/users/signup", "/users/signin", "/users/admin/signin", "/users/merchant/signin", "/users/staff/signin", "/api/files/stream/**", "/api/files/upload", "/api/socket-test/*", "/socket.io/").permitAll()
                         // .requestMatchers("/api/reservations/*").authenticated()
                         .anyRequest().authenticated()
                 )
@@ -82,9 +82,7 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of("http://localhost:3000"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-        // Các headers cho phép
-        configuration.setAllowedHeaders(List.of("Content-Type", "Authorization"));  // Hạn chế các header cụ thể
-
+        configuration.setAllowedHeaders(List.of("Content-Type", "Authorization"));
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
