@@ -2,7 +2,6 @@ package com.project.parkingfinder.repository;
 
 import java.util.List;
 
-import com.project.parkingfinder.enums.VehicleTypeEnum;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -52,6 +51,7 @@ public interface ParkingLotRepository extends JpaRepository<ParkingLot, Long> {
            "WHERE pl.owner_id = :ownerId",
            nativeQuery = true)
     List<ParkingLotProjection> findByOwnerIdWithTotalSlots(@Param("ownerId") Long ownerId, Pageable pageable);
+    
     @Query("""
     SELECT NEW com.project.parkingfinder.dto.VehicleDTO(
         vt.parkingLotId,
@@ -66,6 +66,13 @@ public interface ParkingLotRepository extends JpaRepository<ParkingLot, Long> {
        LEFT JOIN ParkingSlot ps ON ps.vehicleType = vt.type
        WHERE pl.id = :parkingLotId
        """)
-       List<VehicleDTO> findVehiclesAndSlots(@Param("parkingLotId") Long parkingLotId);
-       
+    List<VehicleDTO> findVehiclesAndSlots(@Param("parkingLotId") Long parkingLotId);
+
+    @Query(value = "SELECT pl.*, " +
+           "COALESCE((SELECT SUM(ps.active_slots) FROM parking_slots ps WHERE ps.parking_lot_id = pl.id), 0) AS total_parking_slots, " +
+           "m.url AS image_url " +
+           "FROM parking_lots pl " +
+           "LEFT JOIN medias m ON m.table_id = pl.id AND m.table_type = 'PARKING_LOT' AND m.media_type = 'IMAGE'",
+           nativeQuery = true)
+    List<ParkingLotProjection> findAllWithTotalSlots(Pageable pageable);
 }

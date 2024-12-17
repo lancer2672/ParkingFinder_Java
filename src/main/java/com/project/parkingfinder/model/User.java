@@ -1,6 +1,7 @@
 package com.project.parkingfinder.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.project.parkingfinder.enums.UserStatus;
 
 import jakarta.persistence.*;
@@ -18,6 +19,15 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "parking_lot_id")
+    @JsonIgnore
+    private ParkingLot parkingLot;
+
+    @Column(name = "parking_lot_id", insertable = false, updatable = false)
+    private Long parkingLotId;
+
 
     private String name;
     private String phoneNumber;
@@ -37,7 +47,7 @@ public class User {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "merchant_id")
-    @JsonIgnore
+//    @JsonIgnore
     private User merchant;
 
     @Override

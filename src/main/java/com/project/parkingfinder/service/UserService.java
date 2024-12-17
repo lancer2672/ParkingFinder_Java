@@ -40,6 +40,11 @@ public class UserService {
         return userRepository.findById(id).orElse(null);
     }
 
+    public Page<User> getByParkingLotId(Long parkingLotId, int size, int page) {
+     
+        return userRepository.findByParkingLotIdAndRoleId(parkingLotId, org.springframework.data.domain.PageRequest.of(page, size));
+    }
+
     public List<UserDTO> getMerchants(int size, int page, String status) {
         Long merchantRoleId = roleRepository.findByName(RoleEnum.MERCHANT.name())
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy vai trò người bán")).getId();

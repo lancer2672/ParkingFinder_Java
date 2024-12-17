@@ -10,7 +10,14 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.project.parkingfinder.dto.ParkingLotDTO;
@@ -34,7 +41,7 @@ public class ParkingLotController {
     private final ParkingLotService parkingLotService;
     private final ParkingSlotService parkingSlotService;
 
-
+    
     public ParkingLotController(ParkingLotService parkingLotService, ParkingSlotService parkingSlotService) {
         this.parkingLotService = parkingLotService;
         this.parkingSlotService = parkingSlotService;
@@ -113,6 +120,7 @@ public class ParkingLotController {
         response.put("free_slot", count);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
     @GetMapping("/{parkingLotId}/vehicles")
     public ResponseEntity<List<VehicleDTO>> getVehiclesByParkingLot(
         @PathVariable("parkingLotId") Long parkingLotId) {
@@ -128,6 +136,15 @@ public class ParkingLotController {
         List<ParkingLotDTO> parkingLots = parkingLotService.getParkingLotsByMerchant(merchantId, page, size);
         return new ResponseEntity<>(parkingLots, HttpStatus.OK);
     }
+
+    @GetMapping
+    public ResponseEntity<List<ParkingLotDTO>> getAllParkingLots(
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size) {
+        List<ParkingLotDTO> parkingLots = parkingLotService.getAllParkingLots(page, size);
+        return new ResponseEntity<>(parkingLots, HttpStatus.OK);
+    }
+
     @PatchMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ParkingLotDTO> updateParkingLot(
             @PathVariable("id") Long id,    

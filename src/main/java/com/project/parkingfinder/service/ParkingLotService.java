@@ -25,10 +25,12 @@ import com.project.parkingfinder.exception.ResourceNotFoundException;
 import com.project.parkingfinder.model.Media;
 import com.project.parkingfinder.model.ParkingLot;
 import com.project.parkingfinder.model.ParkingSlot;
+import com.project.parkingfinder.model.User;
 import com.project.parkingfinder.repository.MediaRepository;
 import com.project.parkingfinder.repository.ParkingLotRepository;
 import com.project.parkingfinder.repository.ParkingSlotRepository;
 import com.project.parkingfinder.repository.ReservationRepository;
+import com.project.parkingfinder.repository.UserRepository;
 
 @Service
 public class ParkingLotService  {
@@ -43,6 +45,9 @@ public class ParkingLotService  {
     private ParkingSlotRepository parkingSlotRepository;
     @Autowired
     private FileStorageService fileStorageService;
+    @Autowired
+    private UserRepository userRepo;
+
 
     @Transactional
     public ParkingLotDTO createParkingLot(ParkingLotDTO parkingLotDTO) {
@@ -204,7 +209,6 @@ public class ParkingLotService  {
 
         return new ArrayList<>(dtoMap.values());
     }
-
     public List<ParkingLotDTO> getParkingLotsByMerchant(Long merchantId, int page, int size) {
         PageRequest pageRequest = PageRequest.of(page, size);
         List<ParkingLotProjection> parkingLotsData = parkingLotRepository.findByOwnerIdWithTotalSlots(merchantId, pageRequest);
@@ -214,9 +218,28 @@ public class ParkingLotService  {
         for (ParkingLotProjection projection : parkingLotsData) {
             dtoMap.computeIfAbsent(projection.getId(), id -> createDTO(projection));
             if (projection.getImageUrl() != null) {
-
                 dtoMap.get(projection.getId()).getImages().add( projection.getImageUrl());
             }
+        }
+
+        return new ArrayList<>(dtoMap.values());
+    }
+
+    public List<ParkingLotDTO> getAllParkingLots(int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        List<ParkingLotProjection> parkingLotsData = parkingLotRepository.findAllWithTotalSlots(pageRequest);
+        
+        Map<Long, ParkingLotDTO> dtoMap = new HashMap<>();
+ 
+        for (ParkingLotProjection projection : parkingLotsData) {
+            ParkingLotDTO dto = dtoMap.computeIfAbsent(projection.getId(), id -> createDTO(projection));
+            if (projection.getImageUrl() != null) {
+                dto.getImages().add(projection.getImageUrl());
+            }
+            
+            // Get owner details
+            User owner = userRepo.findById(projection.getOwnerId()).orElseThrow();
+            dto.addUser(owner);
         }
 
         return new ArrayList<>(dtoMap.values());

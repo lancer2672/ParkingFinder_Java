@@ -30,4 +30,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
            nativeQuery = true)
     Page<User> findStaffByMerchant(@Param("merchantId") Long merchantId,@Param("roleId") Long roleId,  Pageable pageable);
 
+    @Query(value = "SELECT * FROM users WHERE parking_lot_id = :parkingLotId",
+           countQuery = "SELECT count(*) FROM users WHERE parking_lot_id = :parkingLotId",
+           nativeQuery = true)
+    Page<User> findByParkingLotIdAndRoleId(@Param("parkingLotId") Long parkingLotId, Pageable pageable);
+
 }

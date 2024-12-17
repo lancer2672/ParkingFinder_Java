@@ -8,6 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.project.parkingfinder.enums.ParkingLotStatus;
+import com.project.parkingfinder.model.User;
 import com.project.parkingfinder.service.LocationService;
 
 import jakarta.validation.constraints.NotBlank;
@@ -65,6 +66,8 @@ public class ParkingLotDTO {
     @JsonIgnore
     private List<MultipartFile> imageFiles;
 
+    private User owner;
+    
     // Constructor for creating a new ParkingLotDTO with image files
     public ParkingLotDTO(String name, String address, double latitude, double longitude,
                          LocalTime openHour, LocalTime closeHour, List<MultipartFile> imageFiles,
@@ -90,5 +93,9 @@ public class ParkingLotDTO {
         this.provinceName = LocationService.getProvinceName(this.provinceId);
         this.districtName = LocationService.getDistrictName(this.provinceId, this.districtId);
         this.wardName = LocationService.getWardName(this.districtId, this.wardId);
+    }
+
+    public void addUser(User user) {
+        this.owner = user;
     }
 }
