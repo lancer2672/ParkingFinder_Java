@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import com.project.parkingfinder.dto.ParkingLotDetail;
 import com.project.parkingfinder.dto.ParkingLotProjection;
 import com.project.parkingfinder.dto.VehicleDTO;
 import com.project.parkingfinder.model.ParkingLot;
@@ -75,4 +76,51 @@ public interface ParkingLotRepository extends JpaRepository<ParkingLot, Long> {
            "LEFT JOIN medias m ON m.table_id = pl.id AND m.table_type = 'PARKING_LOT' AND m.media_type = 'IMAGE'",
            nativeQuery = true)
     List<ParkingLotProjection> findAllWithTotalSlots(Pageable pageable);
+
+  @Query("""
+    SELECT NEW com.project.parkingfinder.dto.ParkingLotDetail(
+        pl.id,
+        pl.ownerId,
+        pl.provinceId,
+        pl.districtId,
+        pl.wardId,
+        pl.name,
+        pl.address,
+        pl.latitude,
+        pl.longitude,
+        pl.openHour,
+        pl.closeHour,
+        pl.status,
+        pl.imageUrls,
+        u
+        )
+    FROM ParkingLot pl
+    LEFT JOIN User u ON u.id = pl.ownerId
+    WHERE pl.id = :id
+    """)
+ParkingLotDetail findParkingLotDetail(@Param("id") Long id);
+
+@Query("""
+    SELECT NEW com.project.parkingfinder.dto.VehicleDTO(
+        vt.parkingLotId,
+        vt.price,
+        vt.type,
+        ps.id,
+        ps.totalSlots,
+        ps.activeSlots)
+    FROM VehicleType vt
+    LEFT JOIN ParkingSlot ps ON ps.parkingLotId = vt.parkingLotId AND ps.vehicleType = vt.type
+    WHERE vt.parkingLotId = :parkingLotId
+    """)
+List<VehicleDTO> findVehiclesByParkingLotId(@Param("parkingLotId") Long parkingLotId);
+
+
+       @Query("""
+       SELECT COALESCE(SUM(ps.totalSlots), 0)
+       FROM ParkingSlot ps
+       WHERE ps.parkingLotId = :id
+       """)
+       Integer findTotalSlotsByParkingLotId(@Param("id") Long id);
+
+
 }

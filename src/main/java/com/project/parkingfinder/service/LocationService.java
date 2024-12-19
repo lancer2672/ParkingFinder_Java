@@ -14,7 +14,7 @@ import lombok.Data;
 
 public class LocationService {
     private static final Map<String, String> provinceMap = new HashMap<>();
-    private static final String BASE_URL = "https://vapi.vnappmob.com";
+    private static final String BASE_URL = "https://open.oapi.vn/location";
 
     static {
         provinceMap.put("92", "Thành phố Cần Thơ");
@@ -88,13 +88,13 @@ public class LocationService {
 
     public static String getDistrictName(String provinceId, String districtId) {
         try {
-            String apiUrl = BASE_URL + "/api/province/district/" + provinceId;
+            String apiUrl = BASE_URL + "/districts/" + provinceId + "?size=1000";
             RestTemplate restTemplate = new RestTemplate();
             ResponseEntity<DistrictResponse> response = restTemplate.getForEntity(apiUrl, DistrictResponse.class);
             
             if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
                 DistrictResponse districtResponse = response.getBody();
-                return districtResponse.getResults().stream()
+                return districtResponse.getData().stream()
                     .filter(district -> district.getDistrictId().equals(districtId))
                     .findFirst()
                     .map(District::getDistrictName)
@@ -108,19 +108,19 @@ public class LocationService {
     }
 
     private static class DistrictResponse {
-        private List<District> results;
+        private List<District> data;
 
-        public List<District> getResults() {
-            return results;
+        public List<District> getData() {
+            return data;
         }
     }
 
     @Data
     private static class District {
-        @JsonProperty("district_id")
+        @JsonProperty("id")
         private String districtId;
         
-        @JsonProperty("district_name")
+        @JsonProperty("name")
         private String districtName;
 
         public String getDistrictId() {
@@ -134,17 +134,17 @@ public class LocationService {
 
     public static String getWardName(String districtId, String wardId) {
         try {
-            String apiUrl = BASE_URL + "/api/province/ward/" + districtId;
+            String apiUrl = BASE_URL + "/wards/" + districtId + "?size=1000";
             RestTemplate restTemplate = new RestTemplate();
             ResponseEntity<WardResponse> response = restTemplate.getForEntity(apiUrl, WardResponse.class);
-            
+
             if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
                 WardResponse wardResponse = response.getBody();
-                return wardResponse.getResults().stream()
-                    .filter(ward -> ward.getWardId().equals(wardId))
-                    .findFirst()
-                    .map(Ward::getWardName)
-                    .orElse("Unknown Ward");
+                return wardResponse.getData().stream()
+                        .filter(ward -> ward.getWardId().equals(wardId))
+                        .findFirst()
+                        .map(Ward::getWardName)
+                        .orElse("Unknown Ward");
             }
         } catch (Exception e) {
             // Log the exception
@@ -154,19 +154,20 @@ public class LocationService {
     }
 
     private static class WardResponse {
-        private List<Ward> results;
+        private List<Ward> data;
 
-        public List<Ward> getResults() {
-            return results;
+        public List<Ward> getData() {
+            return data;
         }
+
     }
 
     @Data
     private static class Ward {
-        @JsonProperty("ward_id")
+        @JsonProperty("id")
         private String wardId;
-        
-        @JsonProperty("ward_name")
+
+        @JsonProperty("name")
         private String wardName;
 
         public String getWardId() {
@@ -177,4 +178,5 @@ public class LocationService {
             return wardName;
         }
     }
+
 }

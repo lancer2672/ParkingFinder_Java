@@ -1,12 +1,7 @@
 package com.project.parkingfinder.dto;
 
 import java.time.LocalTime;
-import java.util.List;
 
-import org.springframework.web.multipart.MultipartFile;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.project.parkingfinder.enums.ParkingLotStatus;
 import com.project.parkingfinder.model.User;
 import com.project.parkingfinder.service.LocationService;
@@ -45,7 +40,7 @@ public class ParkingLotDTO {
     @NotBlank(message = "Địa chỉ là bắt buộc")
     private String address;
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
+    // @JsonInclude(JsonInclude.Include.NON_NULL)
     private Integer capacity;
 
     @NotNull(message = "Vĩ độ là bắt buộc")
@@ -54,23 +49,23 @@ public class ParkingLotDTO {
     @NotNull(message = "Kinh độ là bắt buộc")
     private Double longitude;
 
-    @NotBlank(message = "Giờ mở cửa là bắt buộc")
+    @NotNull(message = "Giờ mở cửa là bắt buộc")
     private LocalTime openHour;
 
-    @NotBlank(message = "Giờ đóng cửa là bắt buộc")
+    @NotNull(message = "Giờ đóng cửa là bắt buộc")
     private LocalTime closeHour;
 
-    private ParkingLotStatus status;
-    private List<String> images;
 
-    @JsonIgnore
-    private List<MultipartFile> imageFiles;
+    private ParkingLotStatus status;
+
+//    @JsonIgnore
+    private String imageUrls;
 
     private User owner;
     
     // Constructor for creating a new ParkingLotDTO with image files
     public ParkingLotDTO(String name, String address, double latitude, double longitude,
-                         LocalTime openHour, LocalTime closeHour, List<MultipartFile> imageFiles,
+                         LocalTime openHour, LocalTime closeHour, String imageUrls,
                          Long ownerId, String provinceId, String districtId, String wardId
                          ) {
         this.name = name;
@@ -79,14 +74,14 @@ public class ParkingLotDTO {
         this.longitude = longitude; 
         this.openHour = openHour;
         this.closeHour = closeHour;
-        this.imageFiles = imageFiles;
+        this.imageUrls = imageUrls;
         this.status = ParkingLotStatus.PENDING; // Set default status to PENDING
         this.ownerId = ownerId;
         this.provinceId = provinceId;
         this.districtId = districtId;
         this.wardId = wardId;
         // Fetch names for province, district, and ward
-//        fetchLocationNames();
+       fetchLocationNames();
     }
 
     public void fetchLocationNames() {

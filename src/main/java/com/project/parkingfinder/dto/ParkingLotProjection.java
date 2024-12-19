@@ -18,5 +18,5 @@ public interface ParkingLotProjection {
     ParkingLotStatus getStatus();
     LocalTime getCloseHour();
     Integer getTotalParkingSlots();
-    String getImageUrl();
+    String getImageUrls();
 }

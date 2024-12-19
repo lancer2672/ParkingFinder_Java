@@ -64,9 +64,12 @@ public class ParkingLot {
     @Column(name = "status")
     private ParkingLotStatus status;
     
-    @OneToMany(mappedBy = "tableId", cascade = CascadeType.ALL, orphanRemoval = true)
-    @SQLRestriction("table_type = 'PARKING_LOT'")
-    private List<Media> media;
+    // @OneToMany(mappedBy = "tableId", cascade = CascadeType.ALL, orphanRemoval = true)
+    // @SQLRestriction("table_type = 'PARKING_LOT'")
+    // private List<Media> media;
+
+    @Column(name = "imageUrls")
+    private String imageUrls;
 
     public ParkingLot() {}
 

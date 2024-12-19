@@ -23,4 +23,5 @@ public class VehicleDTO {
     private Long parkingSlotId;
     private Integer totalSlots;
     private Integer activeSlots;
+    
 }
