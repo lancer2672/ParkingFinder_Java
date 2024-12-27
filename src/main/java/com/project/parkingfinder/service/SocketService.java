@@ -5,11 +5,10 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-
+import io.socket.socketio.server.SocketIoServer;
 import jakarta.annotation.PostConstruct;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import io.socket.socketio.server.SocketIoServer;
 
 @Component
 @Slf4j
@@ -58,14 +57,17 @@ public class SocketService {
         namespace.broadcast(null,"cancel-reservation", jsonMessage);
         log.info("Payment message sent to all clients: CancelMessage " + paymentMessage);
     }
-     public void emitUpdateStatusMsg(String userId, String resId, String status) {
+     public void emitUpdateStatusMsg(String userId, String resId, String status, Double price, String parkingLotID) {
          var namespace = socketServer.namespace("/socketio");
 
         UpdateReservationMsg paymentMessage = new UpdateReservationMsg(userId, resId,status);
+        paymentMessage.setAmount(price);
          JSONObject jsonMessage = new JSONObject();
          jsonMessage.put("userId", paymentMessage.getUserId());
-         jsonMessage.put("reservationId", paymentMessage.getReservationId());
          jsonMessage.put("status", paymentMessage.getStatus());
+         jsonMessage.put("reservationId", paymentMessage.getReservationId());
+         jsonMessage.put("parkinglotId", parkingLotID);
+         jsonMessage.put("amount", paymentMessage.getAmount());
          namespace.broadcast(null,"update-reservation", jsonMessage);
 
         log.info("Payment message sent to all clients: emitUpdateStatusMsg " + paymentMessage);
@@ -99,11 +101,15 @@ public class SocketService {
         private String userId;
         private String reservationId;
         private String status;
+        private Double amount;
 
         public UpdateReservationMsg(String userId, String reservationId, String status) {
             this.userId = userId;
             this.reservationId = reservationId;
             this.status = status;
+        }
+        public void setAmount(Double amount){
+            this.amount = amount;
         }
     }
     @Data

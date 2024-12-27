@@ -10,10 +10,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import com.project.parkingfinder.model.*;
-import com.project.parkingfinder.repository.*;
-import jakarta.annotation.PreDestroy;
-import org.quartz.impl.StdSchedulerFactory;
+import org.quartz.JobBuilder;
+import org.quartz.JobDetail;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
+import org.quartz.Trigger;
+import org.quartz.TriggerBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -23,7 +25,21 @@ import org.springframework.transaction.annotation.Transactional;
 import com.project.parkingfinder.dto.ReservationDTO;
 import com.project.parkingfinder.enums.ParkingLotStatus;
 import com.project.parkingfinder.enums.ReservationStatus;
-import org.quartz.*;
+import com.project.parkingfinder.enums.VehicleTypeEnum;
+import com.project.parkingfinder.model.ParkingLot;
+import com.project.parkingfinder.model.ParkingSlot;
+import com.project.parkingfinder.model.Payment;
+import com.project.parkingfinder.model.Reservation;
+import com.project.parkingfinder.model.User;
+import com.project.parkingfinder.model.VehicleType;
+import com.project.parkingfinder.repository.ParkingLotRepository;
+import com.project.parkingfinder.repository.ParkingSlotRepository;
+import com.project.parkingfinder.repository.PaymentRepository;
+import com.project.parkingfinder.repository.ReservationRepository;
+import com.project.parkingfinder.repository.UserRepository;
+import com.project.parkingfinder.repository.VehicleTypeRepository;
+
+import jakarta.annotation.PreDestroy;
 import jakarta.persistence.EntityNotFoundException;
 
 @Service
@@ -91,7 +107,8 @@ public class ReservationService {
         if (parkingLot.getStatus().equals(ParkingLotStatus.PENDING)) {
             throw new IllegalArgumentException("Bãi đỗ xe chưa được hoạt động");
         }
-        ParkingSlot parkingSlot = parkingSlotRepository.findById(reservationDTO.getParkingLotId())
+        VehicleTypeEnum t = VehicleTypeEnum.valueOf(reservationDTO.getVehicleType());
+        ParkingSlot parkingSlot = parkingSlotRepository.findByParkingLotIdAndVehicleType(reservationDTO.getParkingLotId(), t)
             .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy chỗ đỗ xe"));
 
         VehicleType vehicleType = vehicleTypeRepository.findByTypeAndParkingLotId(reservationDTO.getVehicleType(), parkingSlot.getParkingLotId())
@@ -153,9 +170,10 @@ public class ReservationService {
                 DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
                 String formattedTime = now.format(formatter);
                 reservation.setCheckOutTime(LocalDateTime.parse(formattedTime));
-            }
-            socketService.emitUpdateStatusMsg(reservation.getUser().getId().toString(),reservationId.toString(),status.toString());
 
+            }
+            
+            socketService.emitUpdateStatusMsg(reservation.getUser().getId().toString(),reservationId.toString(),status.toString(), reservation.getPrice(),reservation.getParkingSlot().getParkingLotId().toString());
             reservationRepository.save(reservation);
         }
         catch (Exception e) {
@@ -166,8 +184,8 @@ public class ReservationService {
 
     public UserReservationsResponse getUserReservations(Long userId, int page, int size) {
         try {
-            // Tạo PageRequest để phân trang
-            PageRequest pageRequest = PageRequest.of(page, 1000);
+            // Tạo PageRequest để phân trang và sắp xếp theo thời gian bắt đầu giảm dần
+            PageRequest pageRequest = PageRequest.of(page, size);
             Page<Reservation> reservationsPage = reservationRepository.findByUserId(userId, pageRequest);
 
             // Lấy danh sách đặt chỗ và tổng số bản ghi
@@ -179,7 +197,7 @@ public class ReservationService {
             for (Reservation reservation : reservations) {
                 // Tìm VehicleType
                 VehicleType vehicleType = vehicleTypeRepository
-                        .findByTypeAndParkingLotId(reservation.getCarType().toString(), reservation.getParkingSlot().getId())
+                        .findByTypeAndParkingLotId(reservation.getCarType().toString(), reservation.getParkingSlot().getParkingLotId())
                         .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy loại xe cho bãi đỗ xe đã cho"));
 
                 // Tìm Payment (nếu có)
@@ -200,6 +218,7 @@ public class ReservationService {
             // Tạo và trả về response
             return new UserReservationsResponse(dtos, totalRecords);
         } catch (Exception e) {
+            System.out.println("Error occurred while fetching user reservations: " + e.getMessage());
             throw new InternalError("Lỗi khi lấy dữ liệu đặt chỗ của người dùng");
         }
     }
@@ -220,7 +239,7 @@ public class ReservationService {
                 .withIdentity("cancelTicketTrigger-" + ticketId)
                 .startAt(Date.from(Instant.now().plus(cancelMinute, ChronoUnit.MINUTES)))
                 .build();
-        System.out.println("Trigger created for ticket ID: " + ticketId);
+        System.out.println("Trigger created for ticket ID: " + ticketId  + cancelMinute);
         scheduler.scheduleJob(job, trigger);
     }
 

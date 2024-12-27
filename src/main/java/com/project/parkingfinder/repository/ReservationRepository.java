@@ -23,6 +23,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
                                               @Param("currentTime") LocalDateTime currentTime);
 
 
-    @Query("SELECT r FROM Reservation r WHERE r.user.id = :userId ORDER BY r.checkInTime DESC")
+    @Query("SELECT r FROM Reservation r WHERE r.user.id = :userId ORDER BY r.startTime DESC")
     Page<Reservation> findByUserId(@Param("userId") Long userId, Pageable pageable);
 }

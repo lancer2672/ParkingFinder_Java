@@ -14,4 +14,5 @@ public class UserDTO {
     private String email;
     private UserStatus status;
     private String apiKey;
+    private String avatar;
 }

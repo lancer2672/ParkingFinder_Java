@@ -1,10 +1,19 @@
 package com.project.parkingfinder.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.project.parkingfinder.enums.UserStatus;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -28,7 +37,6 @@ public class User {
     @Column(name = "parking_lot_id", insertable = false, updatable = false)
     private Long parkingLotId;
 
-
     private String name;
     private String phoneNumber;
 
@@ -39,7 +47,6 @@ public class User {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "role_id")
-//    @JsonIgnore
     private Role role;
 
     @Enumerated(EnumType.STRING)
@@ -47,8 +54,9 @@ public class User {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "merchant_id")
-//    @JsonIgnore
     private User merchant;
+
+    private String avatar; // Added avatar field
 
     @Override
     public String toString() {
@@ -60,6 +68,7 @@ public class User {
                 ", role=" + (role != null ? role.getName() : "null") +
                 ", status=" + status +
                 ", merchantId=" + (merchant != null ? merchant.getId() : "null") +
+                ", avatar='" + avatar + '\'' + // Added avatar to toString
                 '}';
     }
 }

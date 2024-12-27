@@ -36,7 +36,7 @@ public class ReservationDTO {
     private Double totalPrice;
 
     private ReservationStatus status;
-    @JsonIgnore
+//    @JsonIgnore
     private Integer cancelMinute;
     private  Payment payment;
     private ParkingLot parkingLot;

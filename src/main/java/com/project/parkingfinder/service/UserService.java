@@ -61,6 +61,7 @@ public class UserService {
                     userDTO.setPhoneNumber(user.getPhoneNumber());
                     userDTO.setEmail(user.getEmail());
                     userDTO.setStatus(user.getStatus());
+                    userDTO.setAvatar(user.getAvatar());
                     // Map to API keys to check if there's a corresponding userId -> get apiKey to attach to userDTO, otherwise assign an empty string
                     try {
                         String apiKey = ApiKeyLoader.loadApiKeys("api_keys.json").stream()
